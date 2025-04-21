@@ -1,9 +1,44 @@
+"use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { CheckCircle } from "lucide-react"
+import { verifyCertificate } from "./actions"
+
+interface VerificationResult {
+  success: boolean
+  message?: string
+  certificate?: {
+    certificateNo: string
+    studentName: string
+    courseTitle: string
+    issueDate: string
+    status: string
+  }
+}
 
 export default function CertificateVerification() {
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [result, setResult] = useState<VerificationResult | null>(null)
+
+  const handleSubmit = async (formData: FormData) => {
+    setIsVerifying(true)
+
+    try {
+      const result = await verifyCertificate(formData)
+      setResult(result)
+    } catch (error) {
+      console.error("Error verifying certificate:", error)
+      setResult({
+        success: false,
+        message: "An error occurred while verifying the certificate",
+      })
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+
   return (
     <div>
       {/* Hero Section */}
@@ -25,12 +60,16 @@ export default function CertificateVerification() {
                 <CardTitle className="text-2xl text-blue-800">Verify Your Certificate</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <form className="space-y-6">
+                <form action={handleSubmit} className="space-y-6">
                   <div className="grid gap-2">
                     <label htmlFor="certificate-number" className="font-medium text-gray-700">
                       Certificate Number
                     </label>
-                    <Input id="certificate-number" placeholder="Enter your certificate number" />
+                    <Input
+                      id="certificate-number"
+                      name="certificate-number"
+                      placeholder="Enter your certificate number"
+                    />
                     <p className="text-sm text-gray-500">
                       The certificate number can be found on the bottom of your certificate.
                     </p>
@@ -40,120 +79,68 @@ export default function CertificateVerification() {
                     <label htmlFor="student-name" className="font-medium text-gray-700">
                       Student Name
                     </label>
-                    <Input id="student-name" placeholder="Enter your full name as on certificate" />
+                    <Input id="student-name" name="student-name" placeholder="Enter your full name as on certificate" />
                   </div>
 
                   <div className="grid gap-2">
                     <label htmlFor="course-name" className="font-medium text-gray-700">
                       Course Name
                     </label>
-                    <Input id="course-name" placeholder="Enter the course name" />
+                    <Input id="course-name" name="course-name" placeholder="Enter the course name" />
                   </div>
 
-                  <Button className="w-full bg-blue-800 hover:bg-blue-900">Verify Certificate</Button>
+                  <Button type="submit" className="w-full bg-blue-800 hover:bg-blue-900" disabled={isVerifying}>
+                    {isVerifying ? "Verifying..." : "Verify Certificate"}
+                  </Button>
                 </form>
               </CardContent>
             </Card>
 
-            {/* Sample Verification Result - This would be shown conditionally based on form submission */}
-            <Card className="border-none shadow-lg mt-8">
-              <CardHeader className="bg-green-50 border-b">
-                <CardTitle className="text-2xl text-green-700 flex items-center gap-2">
-                  <CheckCircle className="h-6 w-6" />
-                  Certificate Verified
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid gap-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Certificate Number</p>
-                      <p className="font-medium">KC-2023-12345</p>
+            {/* Verification Result */}
+            {result && (
+              <Card className="border-none shadow-lg mt-8">
+                <CardHeader className={`${result.success ? "bg-green-50" : "bg-red-50"} border-b`}>
+                  <CardTitle
+                    className={`text-2xl ${result.success ? "text-green-700" : "text-red-700"} flex items-center gap-2`}
+                  >
+                    {result.success ? <>Certificate Verified</> : <>Verification Failed</>}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {result.success ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">Certificate Number</p>
+                          <p className="font-medium">{result.certificate?.certificateNo}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">Issue Date</p>
+                          <p className="font-medium">{new Date(result.certificate?.issueDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">Student Name</p>
+                          <p className="font-medium">{result.certificate?.studentName}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">Course</p>
+                          <p className="font-medium">{result.certificate?.courseTitle}</p>
+                        </div>
+                      </div>
+                      <div className="p-4 bg-green-50 rounded-lg mt-4">
+                        <p className="text-green-800">This is a genuine certificate issued by Krishna Computers.</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Issue Date</p>
-                      <p className="font-medium">15 June, 2023</p>
+                  ) : (
+                    <div className="p-4 bg-red-50 rounded-lg">
+                      <p className="text-red-800">{result.message}</p>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Student Name</p>
-                      <p className="font-medium">John Doe</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Course</p>
-                      <p className="font-medium">Diploma in Computer Applications (DCA)</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Duration</p>
-                      <p className="font-medium">6 Months</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Grade</p>
-                      <p className="font-medium">A (Excellent)</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                    <p className="text-green-700">
-                      This certificate has been verified as authentic and was issued by Krishna Computers.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-16 bg-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-blue-800 mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Common questions about our certificate verification process
-            </p>
-          </div>
-
-          <div className="grid gap-6 max-w-3xl mx-auto">
-            {[
-              {
-                question: "How can I verify my certificate?",
-                answer:
-                  "You can verify your certificate by entering the certificate number, your name, and the course name in the verification form above.",
-              },
-              {
-                question: "Where can I find my certificate number?",
-                answer:
-                  "Your certificate number is printed at the bottom of your certificate, usually in the format KC-YYYY-XXXXX.",
-              },
-              {
-                question: "What if my certificate cannot be verified?",
-                answer:
-                  "If your certificate cannot be verified, please contact our office with your certificate details for further assistance.",
-              },
-              {
-                question: "Can employers verify my certificate?",
-                answer:
-                  "Yes, employers can use the same verification process to confirm the authenticity of your certificate.",
-              },
-              {
-                question: "How long does the verification process take?",
-                answer: "The verification process is instant for valid certificates in our database.",
-              },
-            ].map((faq, index) => (
-              <Card key={index} className="border-none shadow-md">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-blue-800 mb-2">{faq.question}</h3>
-                  <p className="text-gray-700">{faq.answer}</p>
+                  )}
                 </CardContent>
               </Card>
-            ))}
+            )}
           </div>
         </div>
       </section>

@@ -1,0 +1,550 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = []
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  username       String?   @unique
+  role           Role      @default(USER)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  profile        Profile?
+  staff          Staff?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  pincode   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Staff {
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  departmentId String?
+  designation  String?
+  joinDate     DateTime?
+  status       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department   Department?   @relation(fields: [departmentId], references: [id])
+  permissions  Permission[]
+}
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  staff       Staff[]
+}
+
+model Permission {
+  id        String   @id @default(cuid())
+  staffId   String
+  pageId    String
+  canView   Boolean  @default(false)
+  canEdit   Boolean  @default(false)
+  canDelete Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+model Page {
+  id          String       @id @default(cuid())
+  name        String
+  path        String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[]
+}
+
+model Subject {
+  id          String        @id @default(cuid())
+  name        String
+  code        String?
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  courses     CourseSubject[]
+  papers      Paper[]
+}
+
+model Course {
+  id          String        @id @default(cuid())
+  title       String
+  fullTitle   String?
+  category    String?
+  duration    String?
+  description String?
+  image       String?
+  fee         Decimal?      @db.Decimal(10, 2)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  subjects    CourseSubject[]
+  admissions  Admission[]
+  exams       Exam[]
+  batches     Batch[]
+}
+
+model CourseSubject {
+  id        String   @id @default(cuid())
+  courseId  String
+  subjectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+model CourseContent {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  courseId    String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  isPopup   Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Enquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  message   String?
+  course    String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Student {
+  id            String      @id @default(cuid())
+  registrationNo String?    @unique
+  name          String
+  email         String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  dateOfBirth   DateTime?
+  gender        String?
+  photo         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  admissions    Admission[]
+  payments      Payment[]
+  examResults   ExamResult[]
+  certificates  Certificate[]
+  wallet        Wallet?
+  attendances   Attendance[]
+}
+
+model Admission {
+  id            String    @id @default(cuid())
+  studentId     String
+  courseId      String
+  batchId       String?
+  startDate     DateTime
+  endDate       DateTime
+  status        String    @default("active")
+  transferredTo String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  student       Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course        Course    @relation(fields: [courseId], references: [id])
+  batch         Batch?    @relation(fields: [batchId], references: [id])
+  examApplied   ExamApplication[]
+}
+
+model Batch {
+  id          String      @id @default(cuid())
+  name        String
+  courseId    String
+  startDate   DateTime
+  endDate     DateTime?
+  capacity    Int         @default(30)
+  schedule    String?     // JSON string with schedule details
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  admissions  Admission[]
+  attendances AttendanceSession[]
+}
+
+model AttendanceSession {
+  id          String       @id @default(cuid())
+  batchId     String
+  date        DateTime
+  subjectId   String?
+  topic       String?
+  notes       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  batch       Batch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+}
+
+model Attendance {
+  id          String            @id @default(cuid())
+  sessionId   String
+  studentId   String
+  status      AttendanceStatus  @default(PRESENT)
+  remarks     String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  session     AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student     Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  studentId   String
+  admissionId String?
+  amount      Decimal  @db.Decimal(10, 2)
+  paymentDate DateTime @default(now())
+  paymentMode String
+  reference   String?
+  status      String   @default("completed")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model FeeReminder {
+  id        String   @id @default(cuid())
+  days      Int
+  message   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Paper {
+  id          String   @id @default(cuid())
+  title       String
+  subjectId   String
+  totalMarks  Int      @default(100)
+  passingMarks Int     @default(35)
+  duration    Int      @default(60) // in minutes
+  instructions String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  questions   Question[]
+  exams       Exam[]
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  paperId     String
+  question    String
+  optionA     String?
+  optionB     String?
+  optionC     String?
+  optionD     String?
+  answer      String?
+  marks       Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  paper       Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
+}
+
+model Exam {
+  id          String   @id @default(cuid())
+  courseId    String
+  paperId     String
+  examDate    DateTime
+  startTime   DateTime
+  endTime     DateTime
+  venue       String?
+  isOnline    Boolean  @default(false)
+  status      String   @default("scheduled") // scheduled, ongoing, completed, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  course      Course   @relation(fields: [courseId], references: [id])
+  paper       Paper    @relation(fields: [paperId], references: [id])
+  applications ExamApplication[]
+  results     ExamResult[]
+}
+
+model ExamApplication {
+  id          String   @id @default(cuid())
+  admissionId String
+  examId      String
+  status      String   @default("pending") // pending, approved, rejected
+  hallTicket  String?
+  otp         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  admission   Admission @relation(fields: [admissionId], references: [id], onDelete: Cascade)
+  exam        Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+}
+
+model ExamResult {
+  id          String   @id @default(cuid())
+  studentId   String
+  examId      String
+  marks       Int
+  status      String   @default("pass") // pass, fail
+  remarks     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  exam        Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  studentId   String
+  certificateNo String  @unique
+  courseTitle String
+  issueDate   DateTime @default(now())
+  status      String   @default("issued") // issued, revoked
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Wallet {
+  id          String   @id @default(cuid())
+  studentId   String   @unique
+  balance     Decimal  @db.Decimal(10, 2) @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id          String   @id @default(cuid())
+  walletId    String
+  amount      Decimal  @db.Decimal(10, 2)
+  type        String   // credit, debit
+  description String?
+  reference   String?
+  createdAt   DateTime @default(now())
+  wallet      Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+}
+
+model SupportTicket {
+  id          String   @id @default(cuid())
+  userId      String?
+  subject     String
+  description String
+  status      String   @default("open") // open, in-progress, resolved, closed
+  priority    String   @default("medium") // low, medium, high
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  responses   TicketResponse[]
+}
+
+model TicketResponse {
+  id          String   @id @default(cuid())
+  ticketId    String
+  userId      String?
+  message     String
+  createdAt   DateTime @default(now())
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+model SmsPackage {
+  id          String   @id @default(cuid())
+  name        String
+  credits     Int
+  validity    Int      // in days
+  price       Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  purchases   SmsPackagePurchase[]
+}
+
+model SmsPackagePurchase {
+  id          String   @id @default(cuid())
+  packageId   String
+  userId      String
+  purchaseDate DateTime @default(now())
+  expiryDate  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  package     SmsPackage @relation(fields: [packageId], references: [id])
+}
+
+model SmsHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  recipients  Int
+  message     String
+  status      String
+  sentDate    DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  duration    Int      // in days
+  features    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  purchases   SubscriptionPurchase[]
+}
+
+model SubscriptionPurchase {
+  id          String   @id @default(cuid())
+  subscriptionId String
+  userId      String
+  purchaseDate DateTime @default(now())
+  expiryDate  DateTime
+  status      String   @default("active") // active, expired, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+}
+
+model SubCenter {
+  id          String   @id @default(cuid())
+  name        String
+  code        String?  @unique
+  address     String?
+  city        String?
+  state       String?
+  pincode     String?
+  contactName String?
+  contactPhone String?
+  contactEmail String?
+  status      String   @default("active") // active, inactive
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  wallet      CenterWallet?
+}
+
+model CenterWallet {
+  id          String   @id @default(cuid())
+  centerId    String   @unique
+  balance     Decimal  @db.Decimal(10, 2) @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  center      SubCenter @relation(fields: [centerId], references: [id], onDelete: Cascade)
+  transactions CenterWalletTransaction[]
+}
+
+model CenterWalletTransaction {
+  id          String   @id @default(cuid())
+  walletId    String
+  amount      Decimal  @db.Decimal(10, 2)
+  type        String   // credit, debit
+  description String?
+  reference   String?
+  createdAt   DateTime @default(now())
+  wallet      CenterWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+}
+
+model CmsContent {
+  id          String   @id @default(cuid())
+  section     String   // hero, about, courses, etc.
+  key         String   // title, description, etc.
+  value       String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([section, key])
+}
+
+enum Role {
+  USER
+  ADMIN
+  STAFF
+}
