@@ -65,7 +65,8 @@
     "prisma": "latest",
     "react-hot-toast": "latest",
     "@next-auth/prisma-adapter": "latest",
-    "bcryptjs": "latest"
+    "bcryptjs": "latest",
+    "child_process": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
