@@ -2,81 +2,65 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { signIn, useSession } from "next-auth/react"
+import { signIn } from "next-auth/react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { toast } from "react-hot-toast"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 
-export default function AdminLoginPage() {
+export default function LoginPage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
-  const [username, setUsername] = useState("rajsaini")
-  const [password, setPassword] = useState("12345678")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-
-  // Redirect to dashboard if already authenticated as admin
-  useEffect(() => {
-    if (status === "authenticated" && session?.user?.role === "ADMIN") {
-      router.push("/admin/dashboard")
-    }
-  }, [session, status, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-
-    if (!username || !password) {
-      setError("Please enter username and password")
-      toast.error("Please enter username and password")
-      return
-    }
-
     setIsLoading(true)
+    setError(null)
 
     try {
       const result = await signIn("credentials", {
-        username,
+        email,
         password,
         redirect: false,
       })
 
       if (result?.error) {
-        setError("Invalid username or password. Use username: rajsaini, password: 12345678")
-        toast.error("Invalid username or password")
-      } else {
-        toast.success("Logged in successfully")
-
-        // Wait a moment before redirecting to ensure the session is updated
-        setTimeout(() => {
-          // Try router.push first
-          router.push("/admin/dashboard")
-
-          // As a fallback, also use window.location after a short delay
-          setTimeout(() => {
-            window.location.href = "/admin/dashboard"
-          }, 500)
-        }, 1000)
+        setError("Invalid email or password")
+        setIsLoading(false)
+        return
       }
+
+      router.push("/admin")
+      router.refresh()
     } catch (error) {
-      console.error("Login error:", error)
       setError("An error occurred. Please try again.")
-      toast.error("An error occurred. Please try again.")
-    } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/placeholder.svg?height=80&width=80"
+              alt="Krishna Computer Logo"
+              width={80}
+              height={80}
+              className="mx-auto"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
+          <CardDescription>Enter your credentials to access the admin panel</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -85,45 +69,42 @@ export default function AdminLoginPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium">
-                Username
-              </label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={isLoading}
-                placeholder="rajsaini"
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Button variant="link" className="p-0 h-auto text-sm" type="button">
+                  Forgot password?
+                </Button>
+              </div>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                placeholder="12345678"
+                required
               />
             </div>
             <Button type="submit" className="w-full bg-blue-800 hover:bg-blue-900" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <div className="text-center text-sm text-gray-500 w-full">
-            <p>Admin Credentials:</p>
-            <p>Username: rajsaini</p>
-            <p>Password: 12345678</p>
-          </div>
+        <CardFooter className="border-t p-4">
+          <p className="text-center text-sm text-gray-600 w-full">
+            This is a secure area. Unauthorized access is prohibited.
+          </p>
         </CardFooter>
       </Card>
     </div>

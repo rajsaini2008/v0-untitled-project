@@ -1,34 +1,33 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
+import { AuthProvider } from "@/contexts/auth-context"
 import Header from "@/components/header"
-import Footer from "@/components/footer"
 import Navigation from "@/components/navigation"
-import { Providers } from "./providers"
-
-const inter = Inter({ subsets: ["latin"] })
+import Footer from "@/components/footer"
 
 export const metadata: Metadata = {
-  title: "Krishna Computers - Computer Education Institute",
-  description: "Krishna Computers - Leading computer education institute offering various courses and certifications",
+  title: "Krishna Computers",
+  description: "A leading computer education institute",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Providers>
-          <Header />
-          <Navigation />
-          <main>{children}</main>
-          <Footer />
-        </Providers>
+      <body>
+        <AuthProvider>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <Navigation />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )

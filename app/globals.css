@@ -3,47 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --primary: #d4af37;
-  --primary-dark: #b8971f;
-  --secondary: #1e3a8a;
-  --secondary-dark: #172b65;
-  --accent-green: #10b981;
-  --accent-pink: #ec4899;
-  --accent-blue: #3b82f6;
-  --accent-yellow: #f59e0b;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
 }
 
 body {
-  font-family: "Inter", sans-serif;
-  color: #333;
-  background-color: #f8f8f8;
-}
-
-.hero-banner {
-  background-color: var(--primary);
-  background-image: linear-gradient(rgba(212, 175, 55, 0.9), rgba(212, 175, 55, 0.9));
-}
-
-.feature-card {
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-}
-
-.green-card {
-  background-color: var(--accent-green);
-}
-
-.yellow-card {
-  background-color: var(--accent-yellow);
-}
-
-.blue-card {
-  background-color: var(--accent-blue);
-}
-
-.pink-card {
-  background-color: var(--accent-pink);
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }

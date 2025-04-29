@@ -1,39 +1,22 @@
 import type React from "react"
-import type { Metadata } from "next"
-import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
+import Sidebar from "@/components/admin/sidebar"
+import Header from "@/components/admin/header"
+import ProtectedRoute from "@/components/protected-route"
 
-import { AdminSidebar } from "@/components/admin/sidebar"
-import { authOptions } from "@/lib/auth"
-import { Toaster } from "@/components/ui/toaster"
-
-export const metadata: Metadata = {
-  title: "Krishna Computers Admin",
-  description: "Admin panel for Krishna Computers",
-}
-
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    redirect("/admin/login")
-  }
-
-  if (session.user.role !== "ADMIN") {
-    redirect("/")
-  }
-
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      <AdminSidebar />
-      <div className="flex-1 overflow-auto">
-        <main className="h-full">{children}</main>
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        <div className="flex-1">
+          <Header title="Dashboard" />
+          <main className="p-6">{children}</main>
+        </div>
       </div>
-      <Toaster />
-    </div>
+    </ProtectedRoute>
   )
 }

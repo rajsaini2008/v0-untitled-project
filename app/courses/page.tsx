@@ -5,239 +5,423 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function Courses() {
-  const courseCategories = [
-    { id: "all", label: "All Courses" },
-    { id: "basic", label: "Basic Courses" },
-    { id: "advanced", label: "Advanced Courses" },
-    { id: "professional", label: "Professional Courses" },
-  ]
-
   const courses = [
     {
       id: "dca",
       title: "DCA",
       fullTitle: "Diploma in Computer Applications",
-      category: "basic",
       duration: "6 months",
+      level: "Beginner",
       description:
-        "A comprehensive course covering computer fundamentals, office applications, internet usage, and basic programming concepts.",
-      image: "/placeholder.svg?height=200&width=300&text=DCA",
+        "A comprehensive course covering the fundamentals of computer applications including MS Office, internet usage, basic hardware knowledge, and introduction to programming concepts.",
+      modules: [
+        "Computer Fundamentals",
+        "MS Windows",
+        "MS Word",
+        "MS Excel",
+        "MS PowerPoint",
+        "Internet & Email",
+        "Basic Hardware & Troubleshooting",
+        "Introduction to Programming",
+      ],
+      eligibility: "10th Pass or Equivalent",
+      image: "/placeholder.svg?height=300&width=500",
     },
     {
       id: "ccc",
       title: "CCC",
       fullTitle: "Course on Computer Concepts",
-      category: "basic",
       duration: "3 months",
+      level: "Beginner",
       description:
-        "An entry-level course designed to familiarize students with basic computer operations and applications.",
-      image: "/placeholder.svg?height=200&width=300&text=CCC",
+        "A basic course designed to impart fundamental knowledge of computers to the common man. This course is designed to make a person computer literate and give them the basic skills needed to operate a computer effectively.",
+      modules: [
+        "Introduction to Computers",
+        "Operating System Basics",
+        "Word Processing",
+        "Spreadsheets",
+        "Presentations",
+        "Internet & Web Browsing",
+        "Email Management",
+        "Digital Financial Tools",
+      ],
+      eligibility: "No specific prerequisites",
+      image: "/placeholder.svg?height=300&width=500",
     },
     {
       id: "tally",
       title: "Tally",
-      fullTitle: "Tally Prime with GST",
-      category: "professional",
+      fullTitle: "Tally ERP 9",
       duration: "3 months",
-      description: "Learn complete accounting software with GST implementation for business and financial management.",
-      image: "/placeholder.svg?height=200&width=300&text=Tally",
+      level: "Intermediate",
+      description:
+        "A specialized course focusing on Tally ERP 9, one of the most popular accounting software used by businesses across India. Learn to manage accounts, inventory, and taxation.",
+      modules: [
+        "Basic Accounting Concepts",
+        "Introduction to Tally",
+        "Company Creation",
+        "Ledger & Groups",
+        "Voucher Entry",
+        "Inventory Management",
+        "GST in Tally",
+        "Financial Reports & Statements",
+      ],
+      eligibility: "Basic knowledge of accounting",
+      image: "/placeholder.svg?height=300&width=500",
     },
     {
       id: "o-level",
       title: "O Level",
       fullTitle: "NIELIT O Level",
-      category: "advanced",
       duration: "1 year",
+      level: "Intermediate",
       description:
-        "A foundation level course in IT recognized by the Government of India, covering programming, web development, and more.",
-      image: "/placeholder.svg?height=200&width=300&text=O Level",
+        "A foundation level course in IT recognized by the Government of India. It provides students with the necessary skills to take up entry-level positions in the IT industry.",
+      modules: [
+        "IT Tools and Business Systems",
+        "Internet & Web Design",
+        "Programming and Problem Solving through C Language",
+        "Application of .NET Technology",
+        "Introduction to Multimedia",
+      ],
+      eligibility: "10+2 or equivalent",
+      image: "/placeholder.svg?height=300&width=500",
     },
     {
       id: "web-design",
       title: "Web Design",
       fullTitle: "Web Design & Development",
-      category: "advanced",
       duration: "4 months",
-      description: "Learn to create responsive websites using HTML, CSS, JavaScript, and popular frameworks.",
-      image: "/placeholder.svg?height=200&width=300  CSS, JavaScript, and popular frameworks.",
-      image: "/placeholder.svg?height=200&width=300&text=Web Design",
+      level: "Intermediate",
+      description:
+        "Learn to design and develop modern, responsive websites using the latest technologies and best practices in web development.",
+      modules: [
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "Bootstrap",
+        "jQuery",
+        "Responsive Design",
+        "PHP Basics",
+        "MySQL Database",
+      ],
+      eligibility: "Basic computer knowledge",
+      image: "/placeholder.svg?height=300&width=500",
     },
     {
       id: "programming",
       title: "Programming",
-      fullTitle: "Computer Programming",
-      category: "advanced",
+      fullTitle: "Programming Languages",
       duration: "6 months",
-      description: "Master programming languages like C, C++, Java, Python and develop problem-solving skills.",
-      image: "/placeholder.svg?height=200&width=300&text=Programming",
-    },
-    {
-      id: "ms-office",
-      title: "MS Office",
-      fullTitle: "Microsoft Office Suite",
-      category: "basic",
-      duration: "2 months",
+      level: "Intermediate to Advanced",
       description:
-        "Learn to use Word, Excel, PowerPoint, and Outlook for professional document creation and management.",
-      image: "/placeholder.svg?height=200&width=300&text=MS Office",
-    },
-    {
-      id: "graphic-design",
-      title: "Graphic Design",
-      fullTitle: "Graphic Design & Multimedia",
-      category: "professional",
-      duration: "4 months",
-      description: "Create stunning visuals using Photoshop, Illustrator, and other design tools.",
-      image: "/placeholder.svg?height=200&width=300&text=Graphic Design",
+        "A comprehensive course covering multiple programming languages to help students build a strong foundation in programming concepts and practices.",
+      modules: [
+        "C Programming",
+        "C++ Programming",
+        "Java Programming",
+        "Python Programming",
+        "Data Structures",
+        "Algorithms",
+        "Object-Oriented Programming",
+        "Database Connectivity",
+      ],
+      eligibility: "Basic computer knowledge",
+      image: "/placeholder.svg?height=300&width=500",
     },
   ]
 
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="bg-blue-800 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Courses</h1>
-          <p className="text-xl max-w-3xl mx-auto">
-            Comprehensive computer education programs designed to build your skills and advance your career
-          </p>
-        </div>
-      </section>
+    <div className="container mx-auto px-4 py-12">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-blue-800 mb-4">Our Courses</h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Explore our wide range of computer courses designed to help you build the skills needed for a successful
+          career in the IT industry.
+        </p>
+      </div>
 
-      {/* Courses Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <Tabs defaultValue="all" className="w-full">
-            <div className="flex justify-center mb-8">
-              <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {courseCategories.map((category) => (
-                  <TabsTrigger
-                    key={category.id}
-                    value={category.id}
-                    className="px-4 py-2 data-[state=active]:bg-blue-800 data-[state=active]:text-white"
+      <Tabs defaultValue="all" className="mb-12">
+        <div className="flex justify-center mb-8">
+          <TabsList>
+            <TabsTrigger value="all">All Courses</TabsTrigger>
+            <TabsTrigger value="beginner">Beginner</TabsTrigger>
+            <TabsTrigger value="intermediate">Intermediate</TabsTrigger>
+            <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="all" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {courses.map((course) => (
+            <Card key={course.id} className="border-none shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="p-0">
+                <Image
+                  src={course.image || "/placeholder.svg"}
+                  alt={course.title}
+                  width={500}
+                  height={300}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-blue-800">{course.title}</h3>
+                      <p className="text-gray-600">{course.fullTitle}</p>
+                    </div>
+                    <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{course.level}</div>
+                  </div>
+                  <div className="flex justify-between mb-4 text-sm">
+                    <span className="text-gray-600">
+                      <strong>Duration:</strong> {course.duration}
+                    </span>
+                    <span className="text-gray-600">
+                      <strong>Eligibility:</strong> {course.eligibility}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 mb-4 line-clamp-3">{course.description}</p>
+                  <Link
+                    href={`/courses/${course.id}`}
+                    className="inline-block bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded"
                   >
-                    {category.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-
-            {courseCategories.map((category) => (
-              <TabsContent key={category.id} value={category.id} className="mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {courses
-                    .filter((course) => category.id === "all" || course.category === category.id)
-                    .map((course) => (
-                      <Card
-                        key={course.id}
-                        className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-shadow"
-                      >
-                        <div className="relative h-48">
-                          <Image
-                            src={course.image || "/placeholder.svg"}
-                            alt={course.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <CardContent className="p-6">
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-blue-800">{course.title}</h3>
-                              <p className="text-gray-600">{course.fullTitle}</p>
-                            </div>
-                            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                              {course.duration}
-                            </span>
-                          </div>
-                          <p className="text-gray-700 mb-4">{course.description}</p>
-                          <div className="flex justify-between items-center">
-                            <Link href={`/courses/${course.id}`}>
-                              <Button className="bg-blue-800 hover:bg-blue-900">Learn More</Button>
-                            </Link>
-                            <Link href="/apply" className="text-red-500 hover:underline font-medium">
-                              Apply Now
-                            </Link>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    View Details
+                  </Link>
                 </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        </div>
-      </section>
+              </CardContent>
+            </Card>
+          ))}
+        </TabsContent>
 
-      {/* Course Benefits */}
-      <section className="py-16 bg-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-blue-800 mb-4">Benefits of Our Courses</h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Why choose Krishna Computers for your computer education needs
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Industry-Relevant Curriculum",
-                description:
-                  "Our courses are designed in consultation with industry experts to ensure you learn skills that are in demand.",
-              },
-              {
-                title: "Hands-on Training",
-                description:
-                  "Learn by doing with practical exercises and real-world projects that reinforce theoretical concepts.",
-              },
-              {
-                title: "Experienced Faculty",
-                description:
-                  "Learn from instructors who have years of experience in both teaching and industry practice.",
-              },
-              {
-                title: "Flexible Schedule",
-                description:
-                  "Choose from morning, afternoon, or evening batches to fit your education around your other commitments.",
-              },
-              {
-                title: "Placement Assistance",
-                description:
-                  "Get help with resume building, interview preparation, and job placement after course completion.",
-              },
-              {
-                title: "Recognized Certification",
-                description:
-                  "Earn certificates that are recognized by government and industry, enhancing your employability.",
-              },
-            ].map((benefit, index) => (
-              <Card key={index} className="border-none shadow-lg">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-blue-800 mb-3">{benefit.title}</h3>
-                  <p className="text-gray-700">{benefit.description}</p>
+        <TabsContent value="beginner" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {courses
+            .filter((course) => course.level === "Beginner")
+            .map((course) => (
+              <Card key={course.id} className="border-none shadow-lg hover:shadow-xl transition-shadow">
+                <CardContent className="p-0">
+                  <Image
+                    src={course.image || "/placeholder.svg"}
+                    alt={course.title}
+                    width={500}
+                    height={300}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-blue-800">{course.title}</h3>
+                        <p className="text-gray-600">{course.fullTitle}</p>
+                      </div>
+                      <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{course.level}</div>
+                    </div>
+                    <div className="flex justify-between mb-4 text-sm">
+                      <span className="text-gray-600">
+                        <strong>Duration:</strong> {course.duration}
+                      </span>
+                      <span className="text-gray-600">
+                        <strong>Eligibility:</strong> {course.eligibility}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{course.description}</p>
+                    <Link
+                      href={`/courses/${course.id}`}
+                      className="inline-block bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded"
+                    >
+                      View Details
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
-      </section>
+        </TabsContent>
 
-      {/* Call to Action */}
-      <section className="py-16 bg-blue-800 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Learning Journey?</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Enroll in one of our courses today and take the first step towards a successful career in IT.
+        <TabsContent value="intermediate" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {courses
+            .filter((course) => course.level.includes("Intermediate"))
+            .map((course) => (
+              <Card key={course.id} className="border-none shadow-lg hover:shadow-xl transition-shadow">
+                <CardContent className="p-0">
+                  <Image
+                    src={course.image || "/placeholder.svg"}
+                    alt={course.title}
+                    width={500}
+                    height={300}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-blue-800">{course.title}</h3>
+                        <p className="text-gray-600">{course.fullTitle}</p>
+                      </div>
+                      <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{course.level}</div>
+                    </div>
+                    <div className="flex justify-between mb-4 text-sm">
+                      <span className="text-gray-600">
+                        <strong>Duration:</strong> {course.duration}
+                      </span>
+                      <span className="text-gray-600">
+                        <strong>Eligibility:</strong> {course.eligibility}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{course.description}</p>
+                    <Link
+                      href={`/courses/${course.id}`}
+                      className="inline-block bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+        </TabsContent>
+
+        <TabsContent value="advanced" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {courses
+            .filter((course) => course.level.includes("Advanced"))
+            .map((course) => (
+              <Card key={course.id} className="border-none shadow-lg hover:shadow-xl transition-shadow">
+                <CardContent className="p-0">
+                  <Image
+                    src={course.image || "/placeholder.svg"}
+                    alt={course.title}
+                    width={500}
+                    height={300}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-blue-800">{course.title}</h3>
+                        <p className="text-gray-600">{course.fullTitle}</p>
+                      </div>
+                      <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{course.level}</div>
+                    </div>
+                    <div className="flex justify-between mb-4 text-sm">
+                      <span className="text-gray-600">
+                        <strong>Duration:</strong> {course.duration}
+                      </span>
+                      <span className="text-gray-600">
+                        <strong>Eligibility:</strong> {course.eligibility}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{course.description}</p>
+                    <Link
+                      href={`/courses/${course.id}`}
+                      className="inline-block bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+        </TabsContent>
+      </Tabs>
+
+      <div className="bg-gray-100 p-8 rounded-lg mb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">Why Learn With Us?</h2>
+          <p className="text-gray-600 max-w-3xl mx-auto mt-4">
+            At Krishna Computers, we provide more than just courses. We offer a complete learning experience designed to
+            help you succeed.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-red-500 hover:bg-red-600 text-white">Apply Now</Button>
-            <Button className="bg-transparent hover:bg-white hover:text-blue-800 border border-white">
-              Download Brochure
-            </Button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-blue-800"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Expert Faculty</h3>
+            <p className="text-gray-600">Learn from industry professionals with years of experience.</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-green-800"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Practical Training</h3>
+            <p className="text-gray-600">Hands-on experience with real-world projects and case studies.</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-red-800"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Placement Support</h3>
+            <p className="text-gray-600">Dedicated placement assistance to help you find the right job.</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-yellow-800"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Flexible Timings</h3>
+            <p className="text-gray-600">Choose from morning, evening, and weekend batches.</p>
           </div>
         </div>
-      </section>
+      </div>
+
+      <div className="bg-blue-800 text-white p-12 rounded-lg text-center">
+        <h2 className="text-3xl font-bold mb-4">Ready to Enhance Your Skills?</h2>
+        <p className="text-xl mb-8 max-w-2xl mx-auto">
+          Join Krishna Computers today and take the first step towards a successful career in IT.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button className="bg-red-500 hover:bg-red-600 text-white">Enroll Now</Button>
+          <Button className="bg-transparent hover:bg-white hover:text-blue-800 border border-white">
+            Download Brochure
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

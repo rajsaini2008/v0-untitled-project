@@ -1,200 +1,151 @@
 "use client"
 
-import type React from "react"
-
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 import {
-  BookOpen,
-  BadgeIcon as Certificate,
-  ChevronDown,
-  ClipboardList,
-  CreditCard,
-  FileText,
-  LayoutDashboard,
-  MessageSquare,
-  Settings,
   Users,
-  Wallet,
+  GraduationCap,
+  BookOpen,
+  FileText,
+  Building,
+  Award,
+  BarChart,
+  Settings,
+  LogOut,
+  Home,
 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/auth-context"
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-
-interface SidebarItemProps {
-  icon: React.ElementType
-  label: string
-  href: string
-  active?: boolean
+interface SidebarProps {
+  className?: string
 }
 
-interface SidebarGroupProps {
-  icon: React.ElementType
-  label: string
-  children: React.ReactNode
-  defaultOpen?: boolean
-}
-
-const SidebarItem = ({ icon: Icon, label, href, active }: SidebarItemProps) => {
-  return (
-    <Link
-      href={href}
-      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
-        active
-          ? "bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-50"
-          : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-      }`}
-    >
-      <Icon className="h-4 w-4" />
-      <span>{label}</span>
-    </Link>
-  )
-}
-
-const SidebarGroup = ({ icon: Icon, label, children, defaultOpen = false }: SidebarGroupProps) => {
-  return (
-    <Collapsible defaultOpen={defaultOpen} className="w-full">
-      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition-all hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
-        <div className="flex items-center gap-3">
-          <Icon className="h-4 w-4" />
-          <span>{label}</span>
-        </div>
-        <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-      </CollapsibleTrigger>
-      <CollapsibleContent className="pl-10 pt-1">{children}</CollapsibleContent>
-    </Collapsible>
-  )
-}
-
-export function AdminSidebar() {
+export default function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
+  const { user, logout } = useAuth()
+
+  const isAdmin = user?.role === "admin"
+  const isCenterAdmin = user?.role === "center_admin"
+
+  const navItems = [
+    {
+      title: "Dashboard",
+      href: "/admin",
+      icon: <Home className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin", "staff"],
+    },
+    {
+      title: "Students",
+      href: "/admin/students",
+      icon: <Users className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin", "staff"],
+    },
+    {
+      title: "Courses",
+      href: "/admin/courses",
+      icon: <BookOpen className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin", "staff"],
+    },
+    {
+      title: "Enrollments",
+      href: "/admin/enrollments",
+      icon: <GraduationCap className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin", "staff"],
+    },
+    {
+      title: "Exams",
+      href: "/admin/exams",
+      icon: <FileText className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin", "staff"],
+    },
+    {
+      title: "Centers",
+      href: "/admin/centers",
+      icon: <Building className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin"],
+    },
+    {
+      title: "Certificates",
+      href: "/admin/certificates",
+      icon: <Award className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin", "staff"],
+    },
+    {
+      title: "Reports",
+      href: "/admin/reports",
+      icon: <BarChart className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin"],
+    },
+    {
+      title: "Settings",
+      href: "/admin/settings",
+      icon: <Settings className="h-5 w-5" />,
+      allowedRoles: ["admin", "center_admin"],
+    },
+  ]
+
+  const filteredNavItems = navItems.filter((item) => {
+    if (!user?.role) return false
+    return item.allowedRoles.includes(user.role.toLowerCase())
+  })
 
   return (
-    <div className="flex h-screen w-64 flex-col border-r bg-white dark:bg-gray-950">
-      <div className="flex h-14 items-center border-b px-4">
-        <Link href="/admin/dashboard" className="flex items-center gap-2 font-semibold">
-          <BookOpen className="h-5 w-5 text-blue-600" />
-          <span>Krishna Admin</span>
+    <div className={cn("flex flex-col h-full bg-white border-r", className)}>
+      <div className="p-6">
+        <Link href="/admin" className="flex items-center gap-2 font-bold text-xl text-blue-800">
+          <span>Krishna Computers</span>
         </Link>
       </div>
-      <div className="flex-1 overflow-auto py-2">
-        <nav className="grid gap-1 px-2">
-          <SidebarItem
-            icon={LayoutDashboard}
-            label="Dashboard"
-            href="/admin/dashboard"
-            active={pathname === "/admin/dashboard"}
-          />
 
-          <SidebarGroup icon={BookOpen} label="Courses" defaultOpen={pathname.includes("/admin/masters")}>
-            <SidebarItem
-              icon={FileText}
-              label="Manage Courses"
-              href="/admin/masters/courses"
-              active={pathname === "/admin/masters/courses"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Subjects"
-              href="/admin/masters/subjects"
-              active={pathname === "/admin/masters/subjects"}
-            />
-          </SidebarGroup>
+      <div className="px-3 py-2">
+        <div className="space-y-1">
+          {filteredNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                pathname === item.href || pathname.startsWith(`${item.href}/`)
+                  ? "bg-blue-100 text-blue-900"
+                  : "text-gray-700 hover:bg-gray-100",
+              )}
+            >
+              {item.icon}
+              {item.title}
+            </Link>
+          ))}
+        </div>
+      </div>
 
-          <SidebarGroup icon={Users} label="Students" defaultOpen={pathname.includes("/admin/student")}>
-            <SidebarItem
-              icon={FileText}
-              label="All Students"
-              href="/admin/student/records"
-              active={pathname === "/admin/student/records"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Add Student"
-              href="/admin/student/new"
-              active={pathname === "/admin/student/new"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Batches"
-              href="/admin/student/batches"
-              active={pathname === "/admin/student/batches"}
-            />
-          </SidebarGroup>
-
-          <SidebarGroup icon={ClipboardList} label="Exams" defaultOpen={pathname.includes("/admin/exam")}>
-            <SidebarItem
-              icon={FileText}
-              label="Manage Exams"
-              href="/admin/exam/manage"
-              active={pathname === "/admin/exam/manage"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Add Paper"
-              href="/admin/exam/add-paper"
-              active={pathname === "/admin/exam/add-paper"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Applications"
-              href="/admin/exam/applications"
-              active={pathname === "/admin/exam/applications"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Results"
-              href="/admin/exam/results"
-              active={pathname === "/admin/exam/results"}
-            />
-          </SidebarGroup>
-
-          <SidebarGroup icon={Certificate} label="Certificates" defaultOpen={pathname.includes("/admin/certificate")}>
-            <SidebarItem
-              icon={FileText}
-              label="Generate"
-              href="/admin/certificate/generate"
-              active={pathname === "/admin/certificate/generate"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="View All"
-              href="/admin/certificate/show"
-              active={pathname === "/admin/certificate/show"}
-            />
-          </SidebarGroup>
-
-          <SidebarGroup icon={CreditCard} label="Fees" defaultOpen={pathname.includes("/admin/fee")}>
-            <SidebarItem
-              icon={FileText}
-              label="Fee Collection"
-              href="/admin/fee/collect"
-              active={pathname === "/admin/fee/collect"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Fee Structure"
-              href="/admin/fee/structure"
-              active={pathname === "/admin/fee/structure"}
-            />
-            <SidebarItem
-              icon={FileText}
-              label="Reports"
-              href="/admin/fee/reports"
-              active={pathname === "/admin/fee/reports"}
-            />
-          </SidebarGroup>
-
-          <SidebarItem icon={Wallet} label="Wallet" href="/admin/wallet" active={pathname === "/admin/wallet"} />
-
-          <SidebarItem icon={MessageSquare} label="CMS Panel" href="/admin/cms" active={pathname === "/admin/cms"} />
-
-          <SidebarItem
-            icon={Settings}
-            label="Settings"
-            href="/admin/settings"
-            active={pathname === "/admin/settings"}
-          />
-        </nav>
+      <div className="mt-auto p-4">
+        <div className="rounded-md bg-gray-50 p-3">
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-blue-100 p-1">
+              <div className="h-8 w-8 rounded-full bg-blue-800 text-white flex items-center justify-center font-semibold">
+                {user?.name?.charAt(0) || "U"}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium">{user?.name || "User"}</p>
+              <p className="text-xs text-gray-500">{user?.centerName || "Main Center"}</p>
+            </div>
+          </div>
+          <div className="mt-3">
+            <Button
+              variant="outline"
+              className="w-full justify-start text-red-600"
+              onClick={() => {
+                logout()
+                window.location.href = "/login"
+              }}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Log out
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )
