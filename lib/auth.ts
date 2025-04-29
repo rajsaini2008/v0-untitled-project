@@ -1,57 +1,62 @@
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
 
-import prisma from "@/lib/prisma"
+// Hardcoded admin credentials
+const HARDCODED_ADMIN = {
+  id: "hardcoded-admin-id",
+  username: "rajsaini",
+  password: "12345678",
+  email: "admin@krishnacomputers.com",
+  name: "Raj Saini",
+  role: "ADMIN",
+}
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  pages: {
+    signIn: "/admin/login",
+  },
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) {
-          throw new Error("Invalid credentials")
+          return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            username: credentials.username,
-          },
-        })
-
-        if (!user || !user?.hashedPassword) {
-          throw new Error("Invalid credentials")
+        // Only check hardcoded credentials
+        if (credentials.username === HARDCODED_ADMIN.username && credentials.password === HARDCODED_ADMIN.password) {
+          console.log("Using hardcoded admin credentials")
+          return {
+            id: HARDCODED_ADMIN.id,
+            name: HARDCODED_ADMIN.name,
+            email: HARDCODED_ADMIN.email,
+            username: HARDCODED_ADMIN.username,
+            role: HARDCODED_ADMIN.role,
+          }
         }
 
-        const isCorrectPassword = await bcrypt.compare(credentials.password, user.hashedPassword)
-
-        if (!isCorrectPassword) {
-          throw new Error("Invalid credentials")
-        }
-
-        return user
+        // No database check - return null for any other credentials
+        return null
       },
     }),
   ],
-  debug: process.env.NODE_ENV === "development",
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         return {
           ...token,
           id: user.id,
-          role: user.role,
           username: user.username,
+          role: user.role,
         }
       }
       return token
@@ -62,8 +67,8 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id,
-          role: token.role,
           username: token.username,
+          role: token.role,
         },
       }
     },
