@@ -67,27 +67,11 @@ export default function NewStudent() {
         students.push(newStudent)
         localStorage.setItem("students", JSON.stringify(students))
 
-        // Show success message with credentials
+        // Show success message with credentials - using a simpler structure
         toast({
           title: "Student added successfully",
-          description: (
-            <div>
-              <div>
-                {formData.firstName} {formData.lastName} has been added to the system.
-              </div>
-              <div className="mt-2 rounded-md bg-gray-50 p-2">
-                <div className="font-medium">Student Credentials:</div>
-                <div>
-                  Student ID: <span className="font-mono">{studentId}</span>
-                </div>
-                <div>
-                  Password: <span className="font-mono">{password}</span>
-                </div>
-              </div>
-              <div className="mt-2 text-sm text-gray-500">Please share these credentials with the student.</div>
-            </div>
-          ),
-          variant: "credential",
+          description: `${formData.firstName} ${formData.lastName} has been added to the system. Student ID: ${studentId}, Password: ${password}. Please share these credentials with the student.`,
+          variant: "default",
         })
 
         setIsSubmitting(false)
