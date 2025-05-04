@@ -1,175 +1,240 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import Header from "@/components/admin/header"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, MoreHorizontal, Search, FileDown, FileUp } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { UserPlus, MoreHorizontal, Pencil, Trash2, Search } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
 
-export default function StudentsPage() {
+interface Student {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  course: string
+  batch: string
+  joiningDate: string
+  feeStatus: string
+}
+
+export default function AllStudents() {
+  const [students, setStudents] = useState<Student[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // In a real application, this would be an API call
+    // For now, we'll just get the data from localStorage
+    const loadStudents = () => {
+      try {
+        const storedStudents = localStorage.getItem("students")
+        if (storedStudents) {
+          setStudents(JSON.parse(storedStudents))
+        } else {
+          // Add some mock data if no students exist
+          const mockStudents = [
+            {
+              id: "1",
+              firstName: "Rahul",
+              lastName: "Sharma",
+              email: "rahul.sharma@example.com",
+              phone: "9876543210",
+              course: "dca",
+              batch: "morning",
+              joiningDate: "2023-01-15",
+              feeStatus: "paid",
+            },
+            {
+              id: "2",
+              firstName: "Priya",
+              lastName: "Patel",
+              email: "priya.patel@example.com",
+              phone: "8765432109",
+              course: "ccc",
+              batch: "evening",
+              joiningDate: "2023-02-10",
+              feeStatus: "pending",
+            },
+            {
+              id: "3",
+              firstName: "Amit",
+              lastName: "Kumar",
+              email: "amit.kumar@example.com",
+              phone: "7654321098",
+              course: "tally",
+              batch: "afternoon",
+              joiningDate: "2023-03-05",
+              feeStatus: "partial",
+            },
+          ]
+          localStorage.setItem("students", JSON.stringify(mockStudents))
+          setStudents(mockStudents)
+        }
+      } catch (error) {
+        console.error("Error loading students:", error)
+        toast({
+          title: "Error loading students",
+          description: "There was a problem loading the student data.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadStudents()
+  }, [])
+
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to delete this student?")) {
+      const updatedStudents = students.filter((student) => student.id !== id)
+      setStudents(updatedStudents)
+      localStorage.setItem("students", JSON.stringify(updatedStudents))
+      toast({
+        title: "Student deleted",
+        description: "The student has been deleted successfully.",
+      })
+    }
+  }
+
+  const filteredStudents = students.filter(
+    (student) =>
+      student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.phone.includes(searchTerm),
+  )
+
+  const getCourseDisplayName = (courseCode: string) => {
+    const courses: Record<string, string> = {
+      dca: "DCA",
+      ccc: "CCC",
+      tally: "Tally",
+      "o-level": "O Level",
+      "web-design": "Web Design",
+    }
+    return courses[courseCode] || courseCode
+  }
+
+  const getBatchDisplayName = (batchCode: string) => {
+    const batches: Record<string, string> = {
+      morning: "Morning",
+      afternoon: "Afternoon",
+      evening: "Evening",
+      weekend: "Weekend",
+    }
+    return batches[batchCode] || batchCode
+  }
+
+  const getFeeStatusBadgeClass = (status: string) => {
+    const statusClasses: Record<string, string> = {
+      paid: "bg-green-100 text-green-800",
+      pending: "bg-red-100 text-red-800",
+      partial: "bg-yellow-100 text-yellow-800",
+    }
+    return `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses[status] || "bg-gray-100 text-gray-800"}`
+  }
+
   return (
-    <div>
-      <Header title="Students" />
-      <main className="p-6">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">Students</h2>
-              <p className="text-muted-foreground">Manage student records and enrollments</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="h-8 gap-1">
-                <FileDown className="h-4 w-4" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm" className="h-8 gap-1">
-                <FileUp className="h-4 w-4" />
-                Import
-              </Button>
-              <Button size="sm" className="h-8 gap-1" asChild>
-                <Link href="/admin/students/new">
-                  <Plus className="h-4 w-4" />
-                  Add Student
-                </Link>
-              </Button>
-            </div>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold tracking-tight">All Students</h1>
+        <Link href="/admin/students/new">
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add New Student
+          </Button>
+        </Link>
+      </div>
+
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+          <CardTitle>Students</CardTitle>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search students..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Student Records</CardTitle>
-              <CardDescription>View and manage all student records</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                  <Input type="search" placeholder="Search students..." className="pl-8 w-full" />
-                </div>
-                <div className="flex gap-2">
-                  <Select defaultValue="all">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter by course" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Courses</SelectItem>
-                      <SelectItem value="dca">DCA</SelectItem>
-                      <SelectItem value="ccc">CCC</SelectItem>
-                      <SelectItem value="tally">Tally</SelectItem>
-                      <SelectItem value="o-level">O Level</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select defaultValue="active">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="dropped">Dropped</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Reg. No.</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Father's Name</TableHead>
-                      <TableHead>Course</TableHead>
-                      <TableHead>Enrollment Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-800"></div>
+            </div>
+          ) : filteredStudents.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {searchTerm
+                ? "No students found matching your search."
+                : "No students found. Add a new student to get started."}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Course</TableHead>
+                    <TableHead>Batch</TableHead>
+                    <TableHead>Joining Date</TableHead>
+                    <TableHead>Fee Status</TableHead>
+                    <TableHead className="w-[80px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredStudents.map((student) => (
+                    <TableRow key={student.id}>
+                      <TableCell className="font-medium">
+                        {student.firstName} {student.lastName}
+                      </TableCell>
+                      <TableCell>{student.email}</TableCell>
+                      <TableCell>{student.phone}</TableCell>
+                      <TableCell>{getCourseDisplayName(student.course)}</TableCell>
+                      <TableCell>{getBatchDisplayName(student.batch)}</TableCell>
+                      <TableCell>{new Date(student.joiningDate).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <span className={getFeeStatusBadgeClass(student.feeStatus)}>
+                          {student.feeStatus.charAt(0).toUpperCase() + student.feeStatus.slice(1)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(student.id)}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {Array.from({ length: 10 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell className="font-medium">KC-2023-{1000 + i}</TableCell>
-                        <TableCell>Student Name {i + 1}</TableCell>
-                        <TableCell>Father Name {i + 1}</TableCell>
-                        <TableCell>{["DCA", "CCC", "Tally", "O Level"][i % 4]}</TableCell>
-                        <TableCell>{`${10 + (i % 20)}/0${1 + (i % 9)}/2023`}</TableCell>
-                        <TableCell>
-                          <div
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                              i % 3 === 0
-                                ? "bg-green-100 text-green-800"
-                                : i % 3 === 1
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {i % 3 === 0 ? "Active" : i % 3 === 1 ? "Completed" : "Dropped"}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Open menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem>
-                                <Link href={`/admin/students/${1000 + i}`} className="w-full">
-                                  View details
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Link href={`/admin/students/${1000 + i}/edit`} className="w-full">
-                                  Edit student
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Link href={`/admin/students/${1000 + i}/marks`} className="w-full">
-                                  Update marks
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600">Delete student</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <div className="text-sm text-gray-500">
-                  Showing <strong>1-10</strong> of <strong>100</strong> students
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" disabled>
-                    Previous
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -1,202 +1,226 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import Header from "@/components/admin/header"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, MoreHorizontal, Search, Clock, IndianRupee } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Search } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
 
-export default function CoursesPage() {
+interface Course {
+  id: string
+  name: string
+  code: string
+  duration: string
+  fee: string
+  description: string
+  status: string
+}
+
+export default function Courses() {
+  const [courses, setCourses] = useState<Course[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // In a real application, this would be an API call
+    // For now, we'll just get the data from localStorage
+    const loadCourses = () => {
+      try {
+        const storedCourses = localStorage.getItem("courses")
+        if (storedCourses) {
+          setCourses(JSON.parse(storedCourses))
+        } else {
+          // Add some mock data if no courses exist
+          const mockCourses = [
+            {
+              id: "1",
+              name: "Diploma in Computer Applications",
+              code: "DCA",
+              duration: "6 months",
+              fee: "₹12,000",
+              description:
+                "A comprehensive course covering computer fundamentals, office applications, internet usage, and basic programming concepts.",
+              status: "active",
+            },
+            {
+              id: "2",
+              name: "Course on Computer Concepts",
+              code: "CCC",
+              duration: "3 months",
+              fee: "₹6,000",
+              description:
+                "An entry-level course designed to familiarize students with basic computer operations and applications.",
+              status: "active",
+            },
+            {
+              id: "3",
+              name: "Tally Prime with GST",
+              code: "TALLY",
+              duration: "3 months",
+              fee: "₹8,000",
+              description:
+                "Learn complete accounting software with GST implementation for business and financial management.",
+              status: "active",
+            },
+            {
+              id: "4",
+              name: "NIELIT O Level",
+              code: "O-LEVEL",
+              duration: "1 year",
+              fee: "₹25,000",
+              description:
+                "A foundation level course in IT recognized by the Government of India, covering programming, web development, and more.",
+              status: "active",
+            },
+            {
+              id: "5",
+              name: "Web Design & Development",
+              code: "WEB",
+              duration: "4 months",
+              fee: "₹15,000",
+              description: "Learn to create responsive websites using HTML, CSS, JavaScript, and popular frameworks.",
+              status: "active",
+            },
+          ]
+          localStorage.setItem("courses", JSON.stringify(mockCourses))
+          setCourses(mockCourses)
+        }
+      } catch (error) {
+        console.error("Error loading courses:", error)
+        toast({
+          title: "Error loading courses",
+          description: "There was a problem loading the course data.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadCourses()
+  }, [])
+
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to delete this course?")) {
+      const updatedCourses = courses.filter((course) => course.id !== id)
+      setCourses(updatedCourses)
+      localStorage.setItem("courses", JSON.stringify(updatedCourses))
+      toast({
+        title: "Course deleted",
+        description: "The course has been deleted successfully.",
+      })
+    }
+  }
+
+  const filteredCourses = courses.filter(
+    (course) =>
+      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.description.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  const getStatusBadgeClass = (status: string) => {
+    const statusClasses: Record<string, string> = {
+      active: "bg-green-100 text-green-800",
+      inactive: "bg-red-100 text-red-800",
+      upcoming: "bg-blue-100 text-blue-800",
+    }
+    return `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses[status] || "bg-gray-100 text-gray-800"}`
+  }
+
   return (
-    <div>
-      <Header title="Courses" />
-      <main className="p-6">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">Courses</h2>
-              <p className="text-muted-foreground">Manage courses and subjects</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button size="sm" className="h-8 gap-1" asChild>
-                <Link href="/admin/courses/new">
-                  <Plus className="h-4 w-4" />
-                  Add Course
-                </Link>
-              </Button>
-            </div>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold tracking-tight">Courses</h1>
+        <Link href="/admin/courses/new">
+          <Button>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add New Course
+          </Button>
+        </Link>
+      </div>
+
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+          <CardTitle>All Courses</CardTitle>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search courses..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Course List</CardTitle>
-              <CardDescription>View and manage all courses</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                  <Input type="search" placeholder="Search courses..." className="pl-8 w-full" />
-                </div>
-                <div className="flex gap-2">
-                  <Select defaultValue="all">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Course Code</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Duration</TableHead>
-                      <TableHead>Fees</TableHead>
-                      <TableHead>Subjects</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-800"></div>
+            </div>
+          ) : filteredCourses.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {searchTerm
+                ? "No courses found matching your search."
+                : "No courses found. Add a new course to get started."}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Course Name</TableHead>
+                    <TableHead>Code</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Fee</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[80px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredCourses.map((course) => (
+                    <TableRow key={course.id}>
+                      <TableCell className="font-medium">{course.name}</TableCell>
+                      <TableCell>{course.code}</TableCell>
+                      <TableCell>{course.duration}</TableCell>
+                      <TableCell>{course.fee}</TableCell>
+                      <TableCell>
+                        <span className={getStatusBadgeClass(course.status)}>
+                          {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(course.id)}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[
-                      {
-                        code: "DCA",
-                        name: "Diploma in Computer Applications",
-                        duration: 6,
-                        fees: 12000,
-                        subjects: 5,
-                        status: "Active",
-                      },
-                      {
-                        code: "CCC",
-                        name: "Course on Computer Concepts",
-                        duration: 3,
-                        fees: 5000,
-                        subjects: 3,
-                        status: "Active",
-                      },
-                      {
-                        code: "TALLY",
-                        name: "Tally Prime with GST",
-                        duration: 3,
-                        fees: 8000,
-                        subjects: 2,
-                        status: "Active",
-                      },
-                      { code: "OLEVEL", name: "O Level", duration: 12, fees: 25000, subjects: 8, status: "Active" },
-                      {
-                        code: "ADCA",
-                        name: "Advanced Diploma in Computer Applications",
-                        duration: 12,
-                        fees: 20000,
-                        subjects: 7,
-                        status: "Active",
-                      },
-                      {
-                        code: "WEB",
-                        name: "Web Design & Development",
-                        duration: 4,
-                        fees: 15000,
-                        subjects: 4,
-                        status: "Active",
-                      },
-                      {
-                        code: "PROG",
-                        name: "Programming in C/C++",
-                        duration: 3,
-                        fees: 7500,
-                        subjects: 2,
-                        status: "Inactive",
-                      },
-                      {
-                        code: "JAVA",
-                        name: "Java Programming",
-                        duration: 4,
-                        fees: 10000,
-                        subjects: 3,
-                        status: "Inactive",
-                      },
-                    ].map((course, i) => (
-                      <TableRow key={i}>
-                        <TableCell className="font-medium">{course.code}</TableCell>
-                        <TableCell>{course.name}</TableCell>
-                        <TableCell className="flex items-center gap-1">
-                          <Clock className="h-3 w-3 text-gray-500" />
-                          {course.duration} months
-                        </TableCell>
-                        <TableCell className="flex items-center gap-1">
-                          <IndianRupee className="h-3 w-3 text-gray-500" />
-                          {course.fees.toLocaleString()}
-                        </TableCell>
-                        <TableCell>{course.subjects}</TableCell>
-                        <TableCell>
-                          <div
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                              course.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {course.status}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Open menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem>
-                                <Link href={`/admin/courses/${course.code.toLowerCase()}`} className="w-full">
-                                  View details
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Link href={`/admin/courses/${course.code.toLowerCase()}/edit`} className="w-full">
-                                  Edit course
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Link href={`/admin/courses/${course.code.toLowerCase()}/subjects`} className="w-full">
-                                  Manage subjects
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem>
-                                {course.status === "Active" ? "Deactivate course" : "Activate course"}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

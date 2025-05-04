@@ -1,3 +1,0 @@
--- This is a placeholder file for Prisma migrations
--- In a real project, you would use Prisma Migrate to generate migrations
--- For this example, we're using direct SQL execution

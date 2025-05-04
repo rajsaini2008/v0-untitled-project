@@ -1,22 +1,46 @@
+"use client"
+
 import type React from "react"
-import Sidebar from "@/components/admin/sidebar"
-import Header from "@/components/admin/header"
-import ProtectedRoute from "@/components/protected-route"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/auth"
+import AdminSidebar from "@/components/admin/admin-sidebar"
+import { Toaster } from "@/components/ui/toaster"
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <ProtectedRoute>
-      <div className="flex min-h-screen bg-gray-100">
-        <Sidebar />
-        <div className="flex-1">
-          <Header title="Dashboard" />
-          <main className="p-6">{children}</main>
-        </div>
+  const { isAuthenticated, isLoading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login")
+    }
+  }, [isAuthenticated, isLoading, router])
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-b-2 border-t-2 border-blue-800"></div>
       </div>
-    </ProtectedRoute>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      <AdminSidebar />
+      <div className="flex-1 overflow-auto">
+        <main className="p-6">{children}</main>
+      </div>
+      <Toaster />
+    </div>
   )
 }

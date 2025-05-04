@@ -1,157 +1,169 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Award, BookOpen, Users, Target, CheckCircle } from "lucide-react"
 
 export default function AboutUs() {
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-blue-800 mb-4">About Krishna Computers</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          A leading computer education institute dedicated to empowering students with the skills they need to succeed
-          in the digital world.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
-        <div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Story</h2>
-          <p className="text-gray-600 mb-4">
-            Founded in 2005, Krishna Computers has been at the forefront of computer education in India. What started as
-            a small training center with just 5 computers has now grown into a renowned institute with multiple centers
-            across the country.
-          </p>
-          <p className="text-gray-600 mb-4">
-            Our journey has been driven by a passion for education and a commitment to excellence. We believe that
-            quality education should be accessible to all, which is why we offer a range of courses at affordable
-            prices.
-          </p>
-          <p className="text-gray-600">
-            Over the years, we have trained thousands of students who have gone on to build successful careers in the IT
-            industry. Our alumni network is a testament to our dedication and the quality of our education.
+    <div>
+      {/* Hero Section */}
+      <section className="bg-blue-800 text-white py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">About Krishna Computers</h1>
+          <p className="text-xl max-w-3xl mx-auto">
+            A leading computer education institute dedicated to empowering students with the skills they need to succeed
+            in today's digital world.
           </p>
         </div>
-        <div className="flex justify-center">
-          <Image
-            src="/placeholder.svg?height=400&width=600"
-            alt="Krishna Computers Building"
-            width={600}
-            height={400}
-            className="rounded-lg shadow-lg"
-          />
-        </div>
-      </div>
+      </section>
 
-      <div className="bg-gray-100 p-8 rounded-lg mb-16">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Our Mission & Vision</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-2xl font-bold text-blue-800 mb-4">Our Mission</h3>
-            <p className="text-gray-600">
-              To provide high-quality computer education that is accessible, affordable, and relevant to the current
-              industry demands. We aim to empower individuals with the knowledge and skills they need to excel in the
-              digital age.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-2xl font-bold text-blue-800 mb-4">Our Vision</h3>
-            <p className="text-gray-600">
-              To be the leading computer education institute in India, recognized for our excellence in teaching,
-              innovation in curriculum, and the success of our students. We envision a future where every individual has
-              the opportunity to learn and grow in the field of technology.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-16">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Why Choose Us</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Experienced Faculty</h3>
-            <p className="text-gray-600">
-              Our instructors are industry professionals with years of experience in their respective fields. They bring
-              real-world knowledge and practical insights to the classroom.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Modern Infrastructure</h3>
-            <p className="text-gray-600">
-              We provide state-of-the-art facilities with the latest hardware and software to ensure that our students
-              learn on the same tools used in the industry.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-red-500">
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Industry-Relevant Curriculum</h3>
-            <p className="text-gray-600">
-              Our courses are designed in consultation with industry experts to ensure that the content is up-to-date
-              and aligned with current industry requirements.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-yellow-500">
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Placement Assistance</h3>
-            <p className="text-gray-600">
-              We have a dedicated placement cell that helps students find suitable job opportunities. We also conduct
-              regular placement drives with leading companies.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Flexible Learning Options</h3>
-            <p className="text-gray-600">
-              We offer both regular and weekend batches to accommodate the needs of working professionals and students.
-              We also provide online learning options.
-            </p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-pink-500">
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Recognized Certifications</h3>
-            <p className="text-gray-600">
-              Our courses are recognized by industry and government bodies, ensuring that our certifications hold value
-              in the job market.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="text-center mb-16">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Team</h2>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-          Meet the dedicated professionals who make Krishna Computers a center of excellence.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { name: "Rajesh Kumar", position: "Founder & Director", image: "team-1" },
-            { name: "Priya Sharma", position: "Academic Head", image: "team-2" },
-            { name: "Amit Patel", position: "Technical Director", image: "team-3" },
-            { name: "Neha Gupta", position: "Placement Officer", image: "team-4" },
-          ].map((member, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center">
+      {/* Our Story */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="md:w-1/2">
               <Image
-                src={`/placeholder.svg?height=200&width=200`}
-                alt={member.name}
-                width={200}
-                height={200}
-                className="rounded-full mx-auto mb-4"
+                src="/placeholder.svg?height=400&width=600"
+                alt="Krishna Computers Building"
+                width={600}
+                height={400}
+                className="rounded-lg shadow-lg"
               />
-              <h3 className="text-xl font-bold text-gray-800">{member.name}</h3>
-              <p className="text-gray-600">{member.position}</p>
             </div>
-          ))}
+            <div className="md:w-1/2">
+              <h2 className="text-3xl font-bold text-blue-800 mb-6">Our Story</h2>
+              <p className="text-gray-700 mb-4">
+                Founded in 2008, Krishna Computers has been at the forefront of computer education in Kaman, Rajasthan.
+                What started as a small training center has now grown into a comprehensive institute offering a wide
+                range of courses.
+              </p>
+              <p className="text-gray-700 mb-4">
+                Our journey has been defined by a commitment to quality education, innovative teaching methods, and a
+                student-first approach. We have trained thousands of students who have gone on to build successful
+                careers in the IT industry.
+              </p>
+              <p className="text-gray-700 mb-6">
+                At Krishna Computers, we believe in the power of education to transform lives and communities. Our
+                mission is to make quality computer education accessible to all, regardless of their background or prior
+                experience.
+              </p>
+              <Button className="bg-blue-800 hover:bg-blue-900">Learn More</Button>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="bg-blue-800 text-white p-12 rounded-lg text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
-        <p className="text-xl mb-8 max-w-2xl mx-auto">
-          Join Krishna Computers today and take the first step towards a successful career in IT.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button className="bg-red-500 hover:bg-red-600 text-white">Apply Now</Button>
-          <Button className="bg-transparent hover:bg-white hover:text-blue-800 border border-white">Contact Us</Button>
+      {/* Our Values */}
+      <section className="py-16 bg-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-blue-800 mb-4">Our Values</h2>
+            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+              The principles that guide everything we do at Krishna Computers
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: <BookOpen className="h-10 w-10 text-blue-800" />,
+                title: "Quality Education",
+                description: "We are committed to providing the highest quality education with up-to-date curriculum.",
+              },
+              {
+                icon: <Users className="h-10 w-10 text-blue-800" />,
+                title: "Student-Centered",
+                description:
+                  "Our students are at the heart of everything we do, with personalized attention and support.",
+              },
+              {
+                icon: <Target className="h-10 w-10 text-blue-800" />,
+                title: "Innovation",
+                description:
+                  "We constantly innovate our teaching methods and curriculum to stay ahead of industry trends.",
+              },
+              {
+                icon: <Award className="h-10 w-10 text-blue-800" />,
+                title: "Excellence",
+                description:
+                  "We strive for excellence in all aspects of our operations, from teaching to administration.",
+              },
+            ].map((value, index) => (
+              <Card key={index} className="border-none shadow-lg">
+                <CardContent className="p-6 text-center">
+                  <div className="mb-4 flex justify-center">{value.icon}</div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">{value.title}</h3>
+                  <p className="text-gray-600">{value.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Our Team */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-blue-800 mb-4">Our Team</h2>
+            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+              Meet the dedicated professionals who make Krishna Computers a center of excellence
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((member) => (
+              <Card key={member} className="border-none shadow-lg overflow-hidden">
+                <div className="aspect-square relative">
+                  <Image
+                    src={`/placeholder.svg?height=300&width=300&text=Team Member ${member}`}
+                    alt={`Team Member ${member}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <CardContent className="p-6 text-center">
+                  <h3 className="text-xl font-bold text-gray-800 mb-1">Team Member {member}</h3>
+                  <p className="text-blue-800 font-medium mb-3">Position Title</p>
+                  <p className="text-gray-600">
+                    Brief description about the team member and their expertise in the field of computer education.
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="py-16 bg-blue-800 text-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Why Choose Krishna Computers?</h2>
+            <p className="text-xl max-w-3xl mx-auto">
+              We offer more than just computer courses - we provide a pathway to success
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              "Experienced and qualified instructors",
+              "State-of-the-art computer labs and facilities",
+              "Comprehensive curriculum covering the latest technologies",
+              "Hands-on practical training with real-world projects",
+              "Flexible class timings to accommodate working professionals",
+              "Placement assistance and career counseling",
+              "Affordable fee structure with installment options",
+              "Government recognized certifications",
+            ].map((reason, index) => (
+              <div key={index} className="flex items-start gap-4">
+                <CheckCircle className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <p className="text-lg">{reason}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
