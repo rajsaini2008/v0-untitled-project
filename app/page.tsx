@@ -10,7 +10,7 @@ export default function Home() {
       {/* Hero Banner */}
         <div className="w-full">
                 <Image
-                    src="/images/certificate-template.png"
+                    src="/certificate-template.png"
                     alt="University courses information"
                     width={1200}  // Adjusted width for full size
                     height={800}  // Adjusted height proportionally
