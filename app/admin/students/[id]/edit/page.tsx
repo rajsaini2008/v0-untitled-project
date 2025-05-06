@@ -143,7 +143,7 @@ export default function EditStudentPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fatherName">Father's Name</Label>
+                <Label htmlFor="fatherName">Father&apos;s Name</Label>
                 <Input
                   id="fatherName"
                   value={student.fatherName}
@@ -153,7 +153,7 @@ export default function EditStudentPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="motherName">Mother's Name</Label>
+                <Label htmlFor="motherName">Mother&apos;s Name</Label>
                 <Input
                   id="motherName"
                   value={student.motherName}

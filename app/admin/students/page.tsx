@@ -353,11 +353,11 @@ export default function AllStudents() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Father's Name</p>
+                <p className="text-sm text-gray-500">Father&apos;s Name</p>
                 <p className="font-medium">{selectedStudent.fatherName || "N/A"}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Mother's Name</p>
+                <p className="text-sm text-gray-500">Mother&apos;s Name</p>
                 <p className="font-medium">{selectedStudent.motherName || "N/A"}</p>
               </div>
               <div>
@@ -405,7 +405,7 @@ export default function AllStudents() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Student</DialogTitle>
-            <DialogDescription>Update student information. Click save when you're done.</DialogDescription>
+            <DialogDescription>Update student information. Click save when you&apos;re done.</DialogDescription>
           </DialogHeader>
           {selectedStudent && (
             <form onSubmit={handleEditSubmit}>
@@ -431,7 +431,7 @@ export default function AllStudents() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-fatherName">Father's Name</Label>
+                  <Label htmlFor="edit-fatherName">Father&apos;s Name</Label>
                   <Input
                     id="edit-fatherName"
                     name="fatherName"
@@ -440,7 +440,7 @@ export default function AllStudents() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-motherName">Mother's Name</Label>
+                  <Label htmlFor="edit-motherName">Mother&apos;s Name</Label>
                   <Input
                     id="edit-motherName"
                     name="motherName"

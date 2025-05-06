@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu } from "@/components/ui/dropdown-menu"
-import { PlusCircle, Search } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { PlusCircle, Search, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 
 interface Subject {
@@ -138,11 +138,11 @@ export default function Subjects() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (isEditing && currentSubject) {
       // Update existing subject
-      const updatedSubjects = subjects.map(subject => 
-        subject.id === currentSubject.id ? { ...subject, ...formData } : subject
+      const updatedSubjects = subjects.map((subject) =>
+        subject.id === currentSubject.id ? { ...subject, ...formData } : subject,
       )
       setSubjects(updatedSubjects)
       localStorage.setItem("subjects", JSON.stringify(updatedSubjects))
@@ -164,7 +164,7 @@ export default function Subjects() {
         description: "The subject has been added successfully.",
       })
     }
-    
+
     setIsDialogOpen(false)
   }
 
@@ -228,13 +228,41 @@ export default function Subjects() {
                       <TableCell>{subject.code}</TableCell>
                       <TableCell className="max-w-xs truncate">{subject.description}</TableCell>
                       <TableCell>
-                        {subject.courses.map(courseId => {
-                          const course = courses.find(c => c.id === courseId)
-                          return course ? course.code : ""
-                        }).join(", ")}
+                        {subject.courses
+                          .map((courseId) => {
+                            const course = courses.find((c) => c.id === courseId)
+                            return course ? course.code : ""
+                          })
+                          .join(", ")}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
-                          
-
-\
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(subject)}>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(subject.id)}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
