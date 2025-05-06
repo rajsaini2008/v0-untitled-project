@@ -8,40 +8,16 @@ export default function Home() {
   return (
     <div>
       {/* Hero Banner */}
-      <div className="hero-banner py-16 relative overflow-hidden">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 mb-8 md:mb-0">
-            <Image
-              src="/placeholder.svg?height=400&width=400"
-              alt="Students learning computer skills"
-              width={400}
-              height={400}
-              className="rounded-full border-4 border-white"
-            />
-          </div>
-          <div className="md:w-1/2 text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4">कंप्यूटर एक्सपर्ट बनने के लिए</h1>
-            <h2 className="text-3xl md:text-4xl font-bold text-red-600 mb-6">आज ही प्रवेश लीजिए !</h2>
-            <div className="bg-blue-900 text-white p-4 rounded-lg inline-block">
-              <p className="text-xl font-semibold">DCA, CCC, Tally और O-LEVEL</p>
+        <div className="w-full">
+                <Image
+                    src="/images/certificate-template.png"
+                    alt="University courses information"
+                    width={1200}  // Adjusted width for full size
+                    height={800}  // Adjusted height proportionally
+                    className="w-full h-auto object-cover"
+                    priority
+                />
             </div>
-          </div>
-        </div>
-
-        {/* Decorative elements */}
-        <div className="absolute top-10 left-10">
-          <Image src="/placeholder.svg?height=50&width=50" alt="Wifi icon" width={50} height={50} />
-        </div>
-        <div className="absolute bottom-10 right-10">
-          <Image src="/placeholder.svg?height=50&width=50" alt="Wifi icon" width={50} height={50} />
-        </div>
-        <div className="absolute top-1/4 right-1/4">
-          <Image src="/placeholder.svg?height=40&width=40" alt="Cloud icon" width={40} height={40} />
-        </div>
-        <div className="absolute bottom-1/4 left-1/4">
-          <Image src="/placeholder.svg?height=40&width=40" alt="Document icon" width={40} height={40} />
-        </div>
-      </div>
 
       {/* Feature Cards */}
       <div className="container mx-auto px-4 -mt-16 relative z-10">
