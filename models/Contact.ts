@@ -1,31 +1,35 @@
-import mongoose from "mongoose"
+import mongoose, { Schema, type Document } from "mongoose"
 
-// Define the schema if it doesn't exist
-const ContactSchema = new mongoose.Schema({
+export interface IContact extends Document {
+  name: string
+  email: string
+  phone: string
+  subject: string
+  message: string
+  createdAt: Date
+}
+
+const ContactSchema: Schema = new Schema({
   name: {
     type: String,
-    required: [true, "Please provide a name"],
-    maxlength: [60, "Name cannot be more than 60 characters"],
+    required: [true, "Name is required"],
   },
   email: {
     type: String,
-    required: [true, "Please provide an email"],
-    maxlength: [100, "Email cannot be more than 100 characters"],
+    required: [true, "Email is required"],
+    match: [/^\S+@\S+\.\S+$/, "Please use a valid email address"],
   },
   phone: {
     type: String,
-    required: [true, "Please provide a phone number"],
-    maxlength: [15, "Phone number cannot be more than 15 characters"],
+    required: [true, "Phone number is required"],
   },
   subject: {
     type: String,
-    required: [true, "Please provide a subject"],
-    maxlength: [100, "Subject cannot be more than 100 characters"],
+    required: [true, "Subject is required"],
   },
   message: {
     type: String,
-    required: [true, "Please provide a message"],
-    maxlength: [1000, "Message cannot be more than 1000 characters"],
+    required: [true, "Message is required"],
   },
   createdAt: {
     type: Date,
@@ -33,5 +37,5 @@ const ContactSchema = new mongoose.Schema({
   },
 })
 
-// Check if the model exists before creating it to prevent overwriting
-export default mongoose.models.Contact || mongoose.model("Contact", ContactSchema)
+// Check if the model is already defined to prevent overwriting during hot reloads
+export default mongoose.models.Contact || mongoose.model<IContact>("Contact", ContactSchema)

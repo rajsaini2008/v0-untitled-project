@@ -45,7 +45,6 @@ export default function ContactUs() {
         toast({
           title: "Success!",
           description: "Your message has been sent successfully.",
-          variant: "default",
         })
         // Reset form
         setFormData({
@@ -80,7 +79,7 @@ export default function ContactUs() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
           <p className="text-xl max-w-3xl mx-auto">
-            We're here to help! Reach out to us with any questions or inquiries.
+            We&apos;re here to help! Reach out to us with any questions or inquiries.
           </p>
         </div>
       </section>
