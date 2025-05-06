@@ -3,7 +3,19 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, Users, UserPlus, BookOpen, PlusCircle, LogOut, Menu, X } from "lucide-react"
+import {
+  LayoutDashboard,
+  Users,
+  UserPlus,
+  BookOpen,
+  PlusCircle,
+  LogOut,
+  Menu,
+  X,
+  Key,
+  ImageIcon,
+  Award,
+} from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
@@ -40,6 +52,21 @@ export default function AdminSidebar() {
       icon: <Users className="h-5 w-5" />,
     },
     {
+      name: "Add Sub Center",
+      href: "/admin/subcenters/new",
+      icon: <PlusCircle className="h-5 w-5" />,
+    },
+    {
+      name: "All Sub Centers",
+      href: "/admin/subcenters",
+      icon: <Users className="h-5 w-5" />,
+    },
+    {
+      name: "Show All Passwords",
+      href: "/admin/passwords",
+      icon: <Key className="h-5 w-5" />,
+    },
+    {
       name: "Courses",
       href: "/admin/courses",
       icon: <BookOpen className="h-5 w-5" />,
@@ -48,6 +75,16 @@ export default function AdminSidebar() {
       name: "Add Course",
       href: "/admin/courses/new",
       icon: <PlusCircle className="h-5 w-5" />,
+    },
+    {
+      name: "Backgrounds",
+      href: "/admin/backgrounds",
+      icon: <ImageIcon className="h-5 w-5" />,
+    },
+    {
+      name: "Generate Certificate",
+      href: "/admin/generate-certificate",
+      icon: <Award className="h-5 w-5" />,
     },
   ]
 

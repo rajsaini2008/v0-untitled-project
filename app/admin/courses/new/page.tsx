@@ -22,11 +22,17 @@ export default function NewCourse() {
     fee: "",
     description: "",
     status: "active",
+    image: null,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value, type } = e.target as HTMLInputElement
+    if (type === "file") {
+      const file = (e.target as HTMLInputElement).files?.[0] || null
+      setFormData((prev) => ({ ...prev, [name]: file }))
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }))
+    }
   }
 
   const handleSelectChange = (name: string, value: string) => {
@@ -42,12 +48,33 @@ export default function NewCourse() {
     setTimeout(() => {
       // Save to localStorage for demo purposes
       const courses = JSON.parse(localStorage.getItem("courses") || "[]")
+
+      // Create image URL (in a real app, this would be uploaded to a server)
+      let imageUrl = "/placeholder.svg?height=200&width=300&text=" + formData.name
+      if (formData.image) {
+        imageUrl = URL.createObjectURL(formData.image as Blob)
+      }
+
       const newCourse = {
         id: Date.now().toString(),
         ...formData,
+        image: imageUrl,
       }
       courses.push(newCourse)
       localStorage.setItem("courses", JSON.stringify(courses))
+
+      // Update frontend courses
+      const frontendCourses = JSON.parse(localStorage.getItem("frontendCourses") || "[]")
+      frontendCourses.push({
+        id: newCourse.id,
+        title: formData.code,
+        fullTitle: formData.name,
+        category: "basic", // Default category
+        duration: formData.duration,
+        description: formData.description,
+        image: imageUrl,
+      })
+      localStorage.setItem("frontendCourses", JSON.stringify(frontendCourses))
 
       toast({
         title: "Course added successfully",
@@ -131,6 +158,12 @@ export default function NewCourse() {
                 required
                 rows={4}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image">Course Image</Label>
+              <Input id="image" name="image" type="file" accept="image/*" onChange={handleChange} />
+              <p className="text-sm text-gray-500">Upload an image for the course (optional)</p>
             </div>
 
             <div className="space-y-2">

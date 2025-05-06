@@ -13,38 +13,16 @@ export function Toaster() {
           key={toast.id}
           className={`
             rounded-lg border p-4 shadow-md transition-all
-            ${
-              toast.variant === "destructive"
-                ? "bg-red-50 border-red-200"
-                : toast.variant === "credential"
-                  ? "bg-yellow-50 border-yellow-200"
-                  : "bg-white border-gray-200"
-            }
+            ${toast.variant === "destructive" ? "bg-red-50 border-red-200" : "bg-white border-gray-200"}
           `}
         >
           <div className="flex justify-between items-start">
             <div>
-              <h3
-                className={`font-medium ${
-                  toast.variant === "destructive"
-                    ? "text-red-800"
-                    : toast.variant === "credential"
-                      ? "text-yellow-800"
-                      : "text-gray-900"
-                }`}
-              >
+              <h3 className={`font-medium ${toast.variant === "destructive" ? "text-red-800" : "text-gray-900"}`}>
                 {toast.title}
               </h3>
               {toast.description && (
-                <p
-                  className={`mt-1 text-sm ${
-                    toast.variant === "destructive"
-                      ? "text-red-700"
-                      : toast.variant === "credential"
-                        ? "text-yellow-700"
-                        : "text-gray-500"
-                  }`}
-                >
+                <p className={`mt-1 text-sm ${toast.variant === "destructive" ? "text-red-700" : "text-gray-500"}`}>
                   {toast.description}
                 </p>
               )}
@@ -52,11 +30,7 @@ export function Toaster() {
             <button
               onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
               className={`ml-4 inline-flex h-5 w-5 items-center justify-center rounded-md ${
-                toast.variant === "destructive"
-                  ? "text-red-700 hover:bg-red-100"
-                  : toast.variant === "credential"
-                    ? "text-yellow-700 hover:bg-yellow-100"
-                    : "text-gray-500 hover:bg-gray-100"
+                toast.variant === "destructive" ? "text-red-700 hover:bg-red-100" : "text-gray-500 hover:bg-gray-100"
               }`}
             >
               <X className="h-4 w-4" />

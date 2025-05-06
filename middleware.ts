@@ -15,20 +15,9 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Check if the path is for the student portal
-  if (path.startsWith("/student")) {
-    // Get the student data from cookies or localStorage
-    const studentData = request.cookies.get("student_data")?.value
-
-    // If there's no student data, redirect to login
-    if (!studentData && path !== "/login") {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-  }
-
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/student/:path*"],
+  matcher: ["/admin/:path*"],
 }

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 interface ToastProps {
   title: string
   description?: string
-  variant?: "default" | "destructive" | "credential"
+  variant?: "default" | "destructive"
 }
 
 export function toast(props: ToastProps) {

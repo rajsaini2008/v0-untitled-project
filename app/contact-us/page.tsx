@@ -1,10 +1,78 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function ContactUs() {
+  const { toast } = useToast()
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData((prev) => ({ ...prev, [id]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Success!",
+          description: "Your message has been sent successfully.",
+          variant: "default",
+        })
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        })
+      } else {
+        toast({
+          title: "Error!",
+          description: data.message || "Something went wrong. Please try again.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error!",
+        description: "An error occurred. Please try again later.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div>
       {/* Hero Section */}
@@ -76,19 +144,32 @@ export default function ContactUs() {
               <Card className="border-none shadow-lg">
                 <CardContent className="p-6">
                   <h2 className="text-2xl font-bold text-blue-800 mb-6">Send us a Message</h2>
-                  <form className="grid gap-6">
+                  <form className="grid gap-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="grid gap-2">
                         <label htmlFor="name" className="font-medium text-gray-700">
                           Full Name
                         </label>
-                        <Input id="name" placeholder="Your name" />
+                        <Input
+                          id="name"
+                          placeholder="Your name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
                       <div className="grid gap-2">
                         <label htmlFor="email" className="font-medium text-gray-700">
                           Email Address
                         </label>
-                        <Input id="email" type="email" placeholder="Your email" />
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="Your email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
                     </div>
 
@@ -96,24 +177,45 @@ export default function ContactUs() {
                       <label htmlFor="phone" className="font-medium text-gray-700">
                         Phone Number
                       </label>
-                      <Input id="phone" placeholder="Your phone number" />
+                      <Input
+                        id="phone"
+                        placeholder="Your phone number"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                      />
                     </div>
 
                     <div className="grid gap-2">
                       <label htmlFor="subject" className="font-medium text-gray-700">
                         Subject
                       </label>
-                      <Input id="subject" placeholder="Message subject" />
+                      <Input
+                        id="subject"
+                        placeholder="Message subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        required
+                      />
                     </div>
 
                     <div className="grid gap-2">
                       <label htmlFor="message" className="font-medium text-gray-700">
                         Message
                       </label>
-                      <Textarea id="message" placeholder="Your message" rows={5} />
+                      <Textarea
+                        id="message"
+                        placeholder="Your message"
+                        rows={5}
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                      />
                     </div>
 
-                    <Button className="bg-blue-800 hover:bg-blue-900 w-full">Send Message</Button>
+                    <Button type="submit" className="bg-blue-800 hover:bg-blue-900 w-full" disabled={isSubmitting}>
+                      {isSubmitting ? "Sending..." : "Send Message"}
+                    </Button>
                   </form>
                 </CardContent>
               </Card>

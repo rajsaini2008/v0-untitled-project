@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { generateStudentId, generateRandomPassword } from "./utils"
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -9,120 +8,72 @@ const DEFAULT_ADMIN = {
   password: "admin123",
 }
 
-// Student interface
-interface Student {
-  id: string
-  studentId: string
-  name: string
-  email: string
-  phone: string
-  password: string
-  course: string
-  batch: string
-  enrollmentDate: string
-  address?: string
-}
-
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userType, setUserType] = useState<"admin" | "student" | "atc" | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [userType, setUserType] = useState<"admin" | "student" | null>(null)
 
   useEffect(() => {
     // Check if user is authenticated on component mount
-    const adminToken = localStorage.getItem("admin_token")
-    const studentData = localStorage.getItem("current_student")
+    const token = localStorage.getItem("auth_token")
+    const type = localStorage.getItem("user_type")
 
-    if (adminToken) {
+    if (token && type) {
       setIsAuthenticated(true)
-      setUserType("admin")
-    } else if (studentData) {
-      setIsAuthenticated(true)
-      setUserType("student")
-      setCurrentUser(JSON.parse(studentData))
+      setUserType(type as "admin" | "student" | "atc")
     }
 
     setIsLoading(false)
   }, [])
 
-  const login = (email: string, password: string) => {
-    // Check if admin credentials match
-    if (email === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
+  const login = (type: "admin" | "student" | "atc", identifier: string, password: string) => {
+    // Check if credentials match
+    if (type === "admin" && identifier === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
       // Set token in localStorage
-      localStorage.setItem("admin_token", "admin-jwt-token")
-      // Set cookie for middleware
-      document.cookie = `admin_token=admin-jwt-token; path=/; max-age=${60 * 60 * 24 * 7}` // 7 days
+      localStorage.setItem("auth_token", "admin-jwt-token")
+      localStorage.setItem("user_type", "admin")
       setIsAuthenticated(true)
       setUserType("admin")
       return true
-    }
+    } else if (type === "student") {
+      // Check student credentials from localStorage
+      const students = JSON.parse(localStorage.getItem("students") || "[]")
+      const student = students.find((s: any) => s.studentId === identifier && s.password === password)
 
-    // Check if student credentials match
-    const students = JSON.parse(localStorage.getItem("students") || "[]")
-    const student = students.find((s: any) => s.studentId === email && s.password === password)
+      if (student) {
+        localStorage.setItem("auth_token", `student-${student.id}`)
+        localStorage.setItem("user_type", "student")
+        localStorage.setItem("current_user_id", student.id)
+        setIsAuthenticated(true)
+        setUserType("student")
+        return true
+      }
+    } else if (type === "atc") {
+      // Check ATC credentials from localStorage
+      const subCenters = JSON.parse(localStorage.getItem("subCenters") || "[]")
+      const center = subCenters.find((c: any) => c.atcId === identifier && c.password === password)
 
-    if (student) {
-      // Store student data in localStorage
-      localStorage.setItem("current_student", JSON.stringify(student))
-      setIsAuthenticated(true)
-      setUserType("student")
-      setCurrentUser(student)
-      return true
+      if (center) {
+        localStorage.setItem("auth_token", `atc-${center.id}`)
+        localStorage.setItem("user_type", "atc")
+        localStorage.setItem("current_user_id", center.id)
+        setIsAuthenticated(true)
+        setUserType("atc")
+        return true
+      }
     }
 
     return false
   }
 
   const logout = () => {
-    // Remove token and user data from localStorage
-    localStorage.removeItem("admin_token")
-    localStorage.removeItem("current_student")
-    // Remove cookie
-    document.cookie = "admin_token=; path=/; max-age=0"
+    // Remove token from localStorage
+    localStorage.removeItem("auth_token")
+    localStorage.removeItem("user_type")
+    localStorage.removeItem("current_user_id")
     setIsAuthenticated(false)
     setUserType(null)
-    setCurrentUser(null)
   }
 
-  const registerStudent = (studentData: Omit<Student, "studentId" | "password">) => {
-    // Generate student ID and password
-    const studentId = generateStudentId(studentData.course)
-    const password = generateRandomPassword()
-
-    // Create new student object
-    const newStudent = {
-      ...studentData,
-      studentId,
-      password,
-    }
-
-    // Save to localStorage
-    const students = JSON.parse(localStorage.getItem("students") || "[]")
-    students.push(newStudent)
-    localStorage.setItem("students", JSON.stringify(students))
-
-    return { studentId, password }
-  }
-
-  return {
-    isAuthenticated,
-    isLoading,
-    login,
-    logout,
-    registerStudent,
-    userType,
-    currentUser,
-  }
-}
-
-// Helper function to get student data from localStorage
-export function getStudentFromLocalStorage() {
-  const studentData = localStorage.getItem("current_student")
-  return studentData ? JSON.parse(studentData) : null
-}
-
-// Helper function to clear student data from localStorage
-export function clearStudentFromLocalStorage() {
-  localStorage.removeItem("current_student")
+  return { isAuthenticated, isLoading, userType, login, logout }
 }

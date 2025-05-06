@@ -3,20 +3,23 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { BookOpen, FileText, Home, LogOut, Menu, PenTool, User, X } from "lucide-react"
-import { clearStudentFromLocalStorage } from "@/lib/auth"
+import { LayoutDashboard, BookOpen, Award, FileText, User, LogOut, Menu, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { toast } from "@/components/ui/use-toast"
+import { useAuth } from "@/lib/auth"
 
-export function StudentSidebar() {
+export default function StudentSidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { logout } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-  }
-
   const handleLogout = () => {
-    clearStudentFromLocalStorage()
+    logout()
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of the student portal",
+    })
     router.push("/login")
   }
 
@@ -24,117 +27,83 @@ export function StudentSidebar() {
     {
       name: "Dashboard",
       href: "/student/dashboard",
-      icon: Home,
+      icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
-      name: "Profile",
-      href: "/student/profile",
-      icon: User,
-    },
-    {
-      name: "Courses",
+      name: "My Courses",
       href: "/student/courses",
-      icon: BookOpen,
-    },
-    {
-      name: "Certificates",
-      href: "/student/certificates",
-      icon: FileText,
-    },
-    {
-      name: "Marksheets",
-      href: "/student/marksheets",
-      icon: FileText,
+      icon: <BookOpen className="h-5 w-5" />,
     },
     {
       name: "Exams",
       href: "/student/exams",
-      icon: PenTool,
+      icon: <FileText className="h-5 w-5" />,
+    },
+    {
+      name: "Certificates",
+      href: "/student/certificates",
+      icon: <Award className="h-5 w-5" />,
+    },
+    {
+      name: "Profile",
+      href: "/student/profile",
+      icon: <User className="h-5 w-5" />,
     },
   ]
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
 
   return (
     <>
       {/* Mobile menu button */}
-      <button
-        className="fixed right-4 top-4 z-50 rounded-md bg-blue-600 p-2 text-white md:hidden"
-        onClick={toggleMobileMenu}
-      >
-        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
-
-      {/* Sidebar for mobile */}
-      <div
-        className={`fixed inset-0 z-40 transform bg-white transition-transform duration-300 ease-in-out md:hidden ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex h-full flex-col overflow-y-auto bg-white py-4 shadow-xl">
-          <div className="flex items-center justify-center px-4">
-            <h2 className="text-2xl font-bold text-blue-600">Student Portal</h2>
-          </div>
-          <nav className="mt-8 flex flex-1 flex-col px-4">
-            <ul className="space-y-2">
-              {navItems.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center rounded-md px-4 py-2 text-sm font-medium ${
-                      pathname === item.href ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <item.icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full items-center rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-                >
-                  <LogOut className="mr-3 h-5 w-5" />
-                  Logout
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <Button variant="outline" size="icon" onClick={toggleMobileMenu} className="bg-white">
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
       </div>
 
       {/* Sidebar for desktop */}
-      <div className="hidden w-64 flex-shrink-0 bg-white shadow-md md:block">
-        <div className="flex h-full flex-col overflow-y-auto">
-          <div className="flex items-center justify-center border-b px-4 py-6">
-            <h2 className="text-2xl font-bold text-blue-600">Student Portal</h2>
+      <div
+        className={`
+        fixed inset-y-0 left-0 z-40 w-64 transform bg-blue-800 text-white transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
+        <div className="flex h-full flex-col">
+          <div className="flex h-16 items-center justify-center border-b border-blue-700">
+            <h1 className="text-xl font-bold">Student Portal</h1>
           </div>
-          <nav className="mt-8 flex flex-1 flex-col px-4">
-            <ul className="space-y-2">
+
+          <div className="flex-1 overflow-y-auto py-4">
+            <nav className="space-y-1 px-2">
               {navItems.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center rounded-md px-4 py-2 text-sm font-medium ${
-                      pathname === item.href ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    <item.icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full items-center rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`
+                    group flex items-center rounded-md px-2 py-2 text-sm font-medium
+                    ${pathname === item.href ? "bg-blue-900 text-white" : "text-blue-100 hover:bg-blue-700"}
+                  `}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <LogOut className="mr-3 h-5 w-5" />
-                  Logout
-                </button>
-              </li>
-            </ul>
-          </nav>
+                  {item.icon}
+                  <span className="ml-3">{item.name}</span>
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div className="border-t border-blue-700 p-4">
+            <button
+              onClick={handleLogout}
+              className="group flex w-full items-center rounded-md px-2 py-2 text-sm font-medium text-blue-100 hover:bg-blue-700"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="ml-3">Logout</span>
+            </button>
+          </div>
         </div>
       </div>
     </>

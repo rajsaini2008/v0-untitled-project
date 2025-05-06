@@ -21,7 +21,11 @@ export default function Login() {
     password: "",
   })
   const [studentCredentials, setStudentCredentials] = useState({
-    studentId: "",
+    id: "",
+    password: "",
+  })
+  const [atcCredentials, setAtcCredentials] = useState({
+    id: "",
     password: "",
   })
   const [isLoading, setIsLoading] = useState(false)
@@ -31,7 +35,7 @@ export default function Login() {
     setIsLoading(true)
 
     try {
-      const success = login(adminCredentials.email, adminCredentials.password)
+      const success = login("admin", adminCredentials.email, adminCredentials.password)
 
       if (success) {
         toast({
@@ -62,7 +66,7 @@ export default function Login() {
     setIsLoading(true)
 
     try {
-      const success = login(studentCredentials.studentId, studentCredentials.password)
+      const success = login("student", studentCredentials.id, studentCredentials.password)
 
       if (success) {
         toast({
@@ -74,6 +78,37 @@ export default function Login() {
         toast({
           title: "Login failed",
           description: "Invalid student ID or password",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "An error occurred during login",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleATCLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const success = login("atc", atcCredentials.id, atcCredentials.password)
+
+      if (success) {
+        toast({
+          title: "Login successful",
+          description: "Welcome to the ATC panel",
+        })
+        router.push("/atc/dashboard")
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Invalid ATC ID or password",
           variant: "destructive",
         })
       }
@@ -114,10 +149,10 @@ export default function Login() {
               Student
             </TabsTrigger>
             <TabsTrigger
-              value="faculty"
+              value="atc"
               className="px-4 py-2 data-[state=active]:bg-blue-800 data-[state=active]:text-white"
             >
-              Faculty
+              ATC
             </TabsTrigger>
             <TabsTrigger
               value="admin"
@@ -141,8 +176,8 @@ export default function Login() {
                     <Input
                       id="student-id"
                       placeholder="Enter your student ID"
-                      value={studentCredentials.studentId}
-                      onChange={(e) => setStudentCredentials({ ...studentCredentials, studentId: e.target.value })}
+                      value={studentCredentials.id}
+                      onChange={(e) => setStudentCredentials({ ...studentCredentials, id: e.target.value })}
                       required
                     />
                   </div>
@@ -179,35 +214,50 @@ export default function Login() {
               </CardFooter>
             </TabsContent>
 
-            <TabsContent value="faculty" className="mt-0">
+            <TabsContent value="atc" className="mt-0">
               <CardHeader>
-                <CardTitle className="text-xl text-center">Faculty Login</CardTitle>
+                <CardTitle className="text-xl text-center">ATC Login</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={handleATCLogin}>
                   <div className="grid gap-2">
-                    <label htmlFor="faculty-email" className="font-medium text-gray-700">
-                      Email
+                    <label htmlFor="atc-id" className="font-medium text-gray-700">
+                      ATC ID
                     </label>
-                    <Input id="faculty-email" type="email" placeholder="Enter your email" />
+                    <Input
+                      id="atc-id"
+                      placeholder="Enter your ATC ID"
+                      value={atcCredentials.id}
+                      onChange={(e) => setAtcCredentials({ ...atcCredentials, id: e.target.value })}
+                      required
+                    />
                   </div>
                   <div className="grid gap-2">
                     <div className="flex items-center justify-between">
-                      <label htmlFor="faculty-password" className="font-medium text-gray-700">
+                      <label htmlFor="atc-password" className="font-medium text-gray-700">
                         Password
                       </label>
                       <Link href="/forgot-password" className="text-sm text-blue-800 hover:underline">
                         Forgot password?
                       </Link>
                     </div>
-                    <Input id="faculty-password" type="password" placeholder="Enter your password" />
+                    <Input
+                      id="atc-password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={atcCredentials.password}
+                      onChange={(e) => setAtcCredentials({ ...atcCredentials, password: e.target.value })}
+                      required
+                    />
                   </div>
-                  <Button className="w-full bg-blue-800 hover:bg-blue-900">Sign In</Button>
+                  <Button type="submit" className="w-full bg-blue-800 hover:bg-blue-900" disabled={isLoading}>
+                    {isLoading ? "Signing In..." : "Sign In"}
+                  </Button>
                 </form>
               </CardContent>
               <CardFooter className="flex flex-col space-y-4">
                 <div className="text-center text-sm text-gray-600">
-                  Faculty access is restricted.{" "}
+                  ATC access is restricted.{" "}
                   <Link href="/contact-us" className="text-blue-800 hover:underline">
                     Contact admin
                   </Link>{" "}

@@ -13,14 +13,14 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, userType } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && (!isAuthenticated || userType !== "admin")) {
       router.push("/login")
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, userType, router])
 
   if (isLoading) {
     return (
@@ -30,7 +30,7 @@ export default function AdminLayout({
     )
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || userType !== "admin") {
     return null
   }
 

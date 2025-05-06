@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { PlusCircle, MoreHorizontal, Pencil, Trash2, Search } from "lucide-react"
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Search, Eye } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 
 interface Course {
@@ -18,6 +19,7 @@ interface Course {
   fee: string
   description: string
   status: string
+  image?: string
 }
 
 export default function Courses() {
@@ -45,6 +47,7 @@ export default function Courses() {
               description:
                 "A comprehensive course covering computer fundamentals, office applications, internet usage, and basic programming concepts.",
               status: "active",
+              image: "/placeholder.svg?height=200&width=300&text=DCA",
             },
             {
               id: "2",
@@ -55,6 +58,7 @@ export default function Courses() {
               description:
                 "An entry-level course designed to familiarize students with basic computer operations and applications.",
               status: "active",
+              image: "/placeholder.svg?height=200&width=300&text=CCC",
             },
             {
               id: "3",
@@ -65,6 +69,7 @@ export default function Courses() {
               description:
                 "Learn complete accounting software with GST implementation for business and financial management.",
               status: "active",
+              image: "/placeholder.svg?height=200&width=300&text=TALLY",
             },
             {
               id: "4",
@@ -75,6 +80,7 @@ export default function Courses() {
               description:
                 "A foundation level course in IT recognized by the Government of India, covering programming, web development, and more.",
               status: "active",
+              image: "/placeholder.svg?height=200&width=300&text=O-LEVEL",
             },
             {
               id: "5",
@@ -84,10 +90,23 @@ export default function Courses() {
               fee: "₹15,000",
               description: "Learn to create responsive websites using HTML, CSS, JavaScript, and popular frameworks.",
               status: "active",
+              image: "/placeholder.svg?height=200&width=300&text=WEB",
             },
           ]
           localStorage.setItem("courses", JSON.stringify(mockCourses))
           setCourses(mockCourses)
+
+          // Also save to frontend courses
+          const frontendCourses = mockCourses.map((course) => ({
+            id: course.id,
+            title: course.code,
+            fullTitle: course.name,
+            category: "basic",
+            duration: course.duration,
+            description: course.description,
+            image: course.image,
+          }))
+          localStorage.setItem("frontendCourses", JSON.stringify(frontendCourses))
         }
       } catch (error) {
         console.error("Error loading courses:", error)
@@ -109,6 +128,12 @@ export default function Courses() {
       const updatedCourses = courses.filter((course) => course.id !== id)
       setCourses(updatedCourses)
       localStorage.setItem("courses", JSON.stringify(updatedCourses))
+
+      // Also update frontend courses
+      const frontendCourses = JSON.parse(localStorage.getItem("frontendCourses") || "[]")
+      const updatedFrontendCourses = frontendCourses.filter((course: any) => course.id !== id)
+      localStorage.setItem("frontendCourses", JSON.stringify(updatedFrontendCourses))
+
       toast({
         title: "Course deleted",
         description: "The course has been deleted successfully.",
@@ -173,6 +198,7 @@ export default function Courses() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Image</TableHead>
                     <TableHead>Course Name</TableHead>
                     <TableHead>Code</TableHead>
                     <TableHead>Duration</TableHead>
@@ -184,6 +210,16 @@ export default function Courses() {
                 <TableBody>
                   {filteredCourses.map((course) => (
                     <TableRow key={course.id}>
+                      <TableCell>
+                        <div className="relative h-10 w-16">
+                          <Image
+                            src={course.image || "/placeholder.svg?height=40&width=60"}
+                            alt={course.name}
+                            fill
+                            className="object-cover rounded"
+                          />
+                        </div>
+                      </TableCell>
                       <TableCell className="font-medium">{course.name}</TableCell>
                       <TableCell>{course.code}</TableCell>
                       <TableCell>{course.duration}</TableCell>
@@ -202,6 +238,10 @@ export default function Courses() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Pencil className="mr-2 h-4 w-4" />
                               Edit

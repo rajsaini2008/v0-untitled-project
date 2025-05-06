@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -11,16 +11,15 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
-import { useAuth } from "@/lib/auth"
-import { generateStudentId, generateRandomPassword } from "@/lib/utils"
 
 export default function NewStudent() {
   const router = useRouter()
-  const { registerStudent } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    fatherName: "",
+    motherName: "",
     email: "",
     phone: "",
     address: "",
@@ -31,62 +30,94 @@ export default function NewStudent() {
     batch: "",
     joiningDate: "",
     feeStatus: "",
+    photo: null,
+    idCard: null,
+    signature: null,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value, type } = e.target as HTMLInputElement
+    if (type === "file") {
+      const file = (e.target as HTMLInputElement).files?.[0] || null
+      setFormData((prev) => ({ ...prev, [name]: file }))
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }))
+    }
   }
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const generateStudentId = () => {
+    const year = new Date().getFullYear().toString().slice(-2)
+    const randomNum = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0")
+    return `STU${year}${randomNum}`
+  }
+
+  const generatePassword = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    let password = ""
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return password
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    try {
-      // In a real application, this would be an API call to save the student
-      // For now, we'll just simulate a delay and show a success message
-      setTimeout(() => {
-        // Generate student ID and password
-        const studentId = generateStudentId(formData.course)
-        const password = generateRandomPassword()
+    // Generate student ID and password
+    const studentId = generateStudentId()
+    const password = generatePassword()
 
-        // Save to localStorage for demo purposes
-        const students = JSON.parse(localStorage.getItem("students") || "[]")
-        const newStudent = {
-          id: Date.now().toString(),
-          ...formData,
-          name: `${formData.firstName} ${formData.lastName}`,
-          studentId,
-          password,
-          enrollmentDate: formData.joiningDate,
-        }
-        students.push(newStudent)
-        localStorage.setItem("students", JSON.stringify(students))
+    // In a real application, this would be an API call to save the student
+    // For now, we'll just simulate a delay and show a success message
+    setTimeout(() => {
+      // Save to localStorage for demo purposes
+      const students = JSON.parse(localStorage.getItem("students") || "[]")
+      const newStudent = {
+        id: Date.now().toString(),
+        studentId,
+        password,
+        ...formData,
+      }
+      students.push(newStudent)
+      localStorage.setItem("students", JSON.stringify(students))
 
-        // Show success message with credentials - using a simpler structure
-        toast({
-          title: "Student added successfully",
-          description: `${formData.firstName} ${formData.lastName} has been added to the system. Student ID: ${studentId}, Password: ${password}. Please share these credentials with the student.`,
-          variant: "default",
-        })
+      // Also save to passwords collection
+      const passwords = JSON.parse(localStorage.getItem("passwords") || "[]")
+      passwords.push({
+        id: Date.now().toString(),
+        type: "student",
+        userId: studentId,
+        password,
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+      })
+      localStorage.setItem("passwords", JSON.stringify(passwords))
 
-        setIsSubmitting(false)
-        router.push("/admin/students")
-      }, 1000)
-    } catch (error) {
-      console.error("Error adding student:", error)
       toast({
-        title: "Error",
-        description: "There was a problem adding the student.",
-        variant: "destructive",
+        title: "Student added successfully",
+        description: `${formData.firstName} ${formData.lastName} has been added with ID: ${studentId}`,
       })
       setIsSubmitting(false)
-    }
+      router.push("/admin/students")
+    }, 1000)
   }
+
+  // Load available courses
+  const [courses, setCourses] = useState<any[]>([])
+
+  React.useEffect(() => {
+    const storedCourses = localStorage.getItem("courses")
+    if (storedCourses) {
+      setCourses(JSON.parse(storedCourses))
+    }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -119,6 +150,31 @@ export default function NewStudent() {
                   name="lastName"
                   placeholder="Enter last name"
                   value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="fatherName">Father's Name</Label>
+                <Input
+                  id="fatherName"
+                  name="fatherName"
+                  placeholder="Enter father's name"
+                  value={formData.fatherName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="motherName">Mother's Name</Label>
+                <Input
+                  id="motherName"
+                  name="motherName"
+                  placeholder="Enter mother's name"
+                  value={formData.motherName}
                   onChange={handleChange}
                   required
                 />
@@ -209,11 +265,21 @@ export default function NewStudent() {
                     <SelectValue placeholder="Select course" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="dca">DCA</SelectItem>
-                    <SelectItem value="ccc">CCC</SelectItem>
-                    <SelectItem value="tally">Tally</SelectItem>
-                    <SelectItem value="o-level">O Level</SelectItem>
-                    <SelectItem value="web-design">Web Design</SelectItem>
+                    {courses.length > 0 ? (
+                      courses.map((course) => (
+                        <SelectItem key={course.id} value={course.code.toLowerCase()}>
+                          {course.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <>
+                        <SelectItem value="dca">DCA</SelectItem>
+                        <SelectItem value="ccc">CCC</SelectItem>
+                        <SelectItem value="tally">Tally</SelectItem>
+                        <SelectItem value="o-level">O Level</SelectItem>
+                        <SelectItem value="web-design">Web Design</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -256,6 +322,48 @@ export default function NewStudent() {
                   <SelectItem value="partial">Partial</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="photo">Photo</Label>
+                <Input
+                  id="photo"
+                  name="photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null
+                    setFormData((prev) => ({ ...prev, photo: file }))
+                  }}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="idCard">ID Card</Label>
+                <Input
+                  id="idCard"
+                  name="idCard"
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null
+                    setFormData((prev) => ({ ...prev, idCard: file }))
+                  }}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="signature">Signature</Label>
+                <Input
+                  id="signature"
+                  name="signature"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null
+                    setFormData((prev) => ({ ...prev, signature: file }))
+                  }}
+                />
+              </div>
             </div>
 
             <div className="flex justify-end space-x-4">

@@ -1,195 +1,182 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getStudentFromLocalStorage } from "@/lib/auth"
-
-interface Student {
-  id: string
-  name: string
-  email: string
-  phone: string
-  address: string
-  course: string
-  enrollmentDate: string
-  studentId: string
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { BookOpen, Award, FileText, Clock } from "lucide-react"
 
 export default function StudentDashboard() {
-  const [student, setStudent] = useState<Student | null>(null)
-  const [courses, setCourses] = useState<any[]>([])
+  const [student, setStudent] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const studentData = getStudentFromLocalStorage()
-    if (studentData) {
-      setStudent(studentData)
+    // Get current student ID from localStorage
+    const currentUserId = localStorage.getItem("current_user_id")
+
+    if (currentUserId) {
+      // Get student data
+      const students = JSON.parse(localStorage.getItem("students") || "[]")
+      const currentStudent = students.find((s: any) => s.id === currentUserId)
+
+      if (currentStudent) {
+        setStudent(currentStudent)
+      }
     }
 
-    // Get courses from localStorage
-    const storedCourses = localStorage.getItem("courses")
-    if (storedCourses) {
-      const parsedCourses = JSON.parse(storedCourses)
-      setCourses(parsedCourses)
-    }
+    setIsLoading(false)
   }, [])
 
-  const studentCourse = courses.find((course) => course.name === student?.course)
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-800"></div>
+      </div>
+    )
+  }
+
+  if (!student) {
+    return (
+      <div className="text-center py-8">
+        <h2 className="text-2xl font-bold">Student Not Found</h2>
+        <p className="text-gray-600 mt-2">Unable to load student information.</p>
+      </div>
+    )
+  }
+
+  const getCourseDisplayName = (courseCode: string) => {
+    const courses: Record<string, string> = {
+      dca: "Diploma in Computer Applications",
+      ccc: "Course on Computer Concepts",
+      tally: "Tally Prime with GST",
+      "o-level": "NIELIT O Level",
+      "web-design": "Web Design & Development",
+    }
+    return courses[courseCode] || courseCode
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Student Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Student Dashboard</h1>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Welcome</CardTitle>
-            <CardDescription>{student?.name || "Student"}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{student?.studentId}</p>
-            <p className="text-sm text-muted-foreground">Student ID</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Current Course</CardTitle>
-            <CardDescription>Your enrolled course</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{student?.course || "N/A"}</p>
-            <p className="text-sm text-muted-foreground">
-              Enrolled on: {student?.enrollmentDate ? new Date(student.enrollmentDate).toLocaleDateString() : "N/A"}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Course Duration</CardTitle>
-            <CardDescription>Total duration of your course</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{studentCourse?.duration || "N/A"}</p>
-            <p className="text-sm text-muted-foreground">Months</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Links</CardTitle>
-          <CardDescription>Access important resources and information</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <a
-              href="/student/profile"
-              className="flex flex-col items-center justify-center rounded-lg border border-dashed p-4 text-center hover:bg-gray-50"
-            >
-              <div className="mb-2 rounded-full bg-blue-100 p-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-6 w-6 text-blue-600"
-                >
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
-              <h3 className="font-medium">Profile</h3>
-              <p className="text-sm text-gray-500">View your profile</p>
-            </a>
-            <a
-              href="/student/courses"
-              className="flex flex-col items-center justify-center rounded-lg border border-dashed p-4 text-center hover:bg-gray-50"
-            >
-              <div className="mb-2 rounded-full bg-green-100 p-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-6 w-6 text-green-600"
-                >
-                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-                  <path d="M8 7h6"></path>
-                  <path d="M8 11h8"></path>
-                  <path d="M8 15h5"></path>
-                </svg>
-              </div>
-              <h3 className="font-medium">Courses</h3>
-              <p className="text-sm text-gray-500">View course details</p>
-            </a>
-            <a
-              href="/student/certificates"
-              className="flex flex-col items-center justify-center rounded-lg border border-dashed p-4 text-center hover:bg-gray-50"
-            >
-              <div className="mb-2 rounded-full bg-purple-100 p-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-6 w-6 text-purple-600"
-                >
-                  <path d="M12 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path>
-                  <path d="M20 12a8 8 0 1 0-16 0v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6z"></path>
-                  <path d="M10 20v-4a2 2 0 1 1 4 0v4"></path>
-                </svg>
-              </div>
-              <h3 className="font-medium">Certificates</h3>
-              <p className="text-sm text-gray-500">View your certificates</p>
-            </a>
-            <a
-              href="/student/exams"
-              className="flex flex-col items-center justify-center rounded-lg border border-dashed p-4 text-center hover:bg-gray-50"
-            >
-              <div className="mb-2 rounded-full bg-yellow-100 p-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-6 w-6 text-yellow-600"
-                >
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <path d="M14 2v6h6"></path>
-                  <path d="M16 13H8"></path>
-                  <path d="M16 17H8"></path>
-                  <path d="M10 9H8"></path>
-                </svg>
-              </div>
-              <h3 className="font-medium">Exams</h3>
-              <p className="text-sm text-gray-500">Take your exams</p>
-            </a>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">
+          Welcome, {student.firstName} {student.lastName}!
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Student ID</p>
+            <p className="font-medium">{student.studentId}</p>
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p className="text-sm text-gray-500">Course</p>
+            <p className="font-medium">{getCourseDisplayName(student.course)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Batch</p>
+            <p className="font-medium">{student.batch.charAt(0).toUpperCase() + student.batch.slice(1)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Joining Date</p>
+            <p className="font-medium">{new Date(student.joiningDate).toLocaleDateString()}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Current Course</CardTitle>
+            <BookOpen className="h-5 w-5 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold">{getCourseDisplayName(student.course)}</div>
+            <p className="text-xs text-muted-foreground">In progress</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Upcoming Exams</CardTitle>
+            <FileText className="h-5 w-5 text-yellow-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold">2</div>
+            <p className="text-xs text-muted-foreground">Next exam in 3 days</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Certificates</CardTitle>
+            <Award className="h-5 w-5 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold">0</div>
+            <p className="text-xs text-muted-foreground">Complete your course to earn certificates</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Course Duration</CardTitle>
+            <Clock className="h-5 w-5 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold">6 months</div>
+            <p className="text-xs text-muted-foreground">3 months remaining</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { activity: "Logged in to student portal", time: "Today, 10:30 AM" },
+                { activity: "Completed Module 3 Quiz", time: "Yesterday, 3:45 PM" },
+                { activity: "Submitted Assignment 2", time: "3 days ago" },
+                { activity: "Attended online class", time: "1 week ago" },
+              ].map((item, index) => (
+                <div key={index} className="flex items-start gap-4 border-b pb-4 last:border-0 last:pb-0">
+                  <div className="w-2 h-2 mt-1.5 rounded-full bg-blue-600"></div>
+                  <div className="space-y-1">
+                    <p className="text-sm">{item.activity}</p>
+                    <p className="text-xs text-muted-foreground">{item.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming Schedule</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { event: "Module 4 Quiz", date: "May 10, 2023", time: "10:00 AM" },
+                { event: "Assignment 3 Deadline", date: "May 15, 2023", time: "11:59 PM" },
+                { event: "Mid-term Exam", date: "May 20, 2023", time: "9:00 AM" },
+                { event: "Group Project Presentation", date: "May 25, 2023", time: "2:00 PM" },
+              ].map((item, index) => (
+                <div key={index} className="flex items-start gap-4 border-b pb-4 last:border-0 last:pb-0">
+                  <div className="w-2 h-2 mt-1.5 rounded-full bg-yellow-600"></div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">{item.event}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.date} at {item.time}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
