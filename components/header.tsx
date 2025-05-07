@@ -1,208 +1,51 @@
-"use client"
-
-import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { useSession, signOut } from "next-auth/react"
-import { Menu, X } from "lucide-react"
+import { Phone, Mail, Facebook, Twitter, Instagram, Info } from "lucide-react"
 
-export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const pathname = usePathname()
-  const { data: session } = useSession()
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
-  }
-
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false)
-  }
-
-  const isActive = (path: string) => {
-    return pathname === path
-  }
-
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" })
-  }
-
+export default function Header() {
   return (
-    <header className="bg-white border-b sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <span className="text-xl font-bold text-blue-600">Krishna Computers</span>
-          </Link>
-
-          {/* Mobile menu button */}
-          <button className="md:hidden focus:outline-none" onClick={toggleMobileMenu} aria-label="Toggle menu">
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
-            <Link
-              href="/"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive("/") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/about-us"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive("/about-us") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              About Us
-            </Link>
-            <Link
-              href="/courses"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive("/courses") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Courses
-            </Link>
-            <Link
-              href="/gallery"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive("/gallery") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Gallery
-            </Link>
-            <Link
-              href="/certificate-verification"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive("/certificate-verification") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Verify Certificate
-            </Link>
-            <Link
-              href="/contact-us"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive("/contact-us") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Contact
-            </Link>
-
-            {session ? (
-              <>
-                <Link href={`/${session.user.role}/dashboard`}>
-                  <Button variant="outline" size="sm">
-                    Dashboard
-                  </Button>
-                </Link>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  Sign Out
-                </Button>
-              </>
-            ) : (
-              <Link href="/login">
-                <Button variant="default" size="sm">
-                  Login
-                </Button>
-              </Link>
-            )}
-          </nav>
+    <div className="bg-black text-white py-2 px-4">
+      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
+        <div className="flex items-center gap-6 mb-2 md:mb-0">
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4" />
+            <span className="text-sm">9001203861, 9772225669</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            <span className="text-sm">krishna.computers.official2008@gmail.com</span>
+          </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden py-3 px-2 space-y-1 border-t">
-            <Link
-              href="/"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive("/") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={closeMobileMenu}
-            >
-              Home
-            </Link>
-            <Link
-              href="/about-us"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive("/about-us") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={closeMobileMenu}
-            >
-              About Us
-            </Link>
-            <Link
-              href="/courses"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive("/courses") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={closeMobileMenu}
-            >
-              Courses
-            </Link>
-            <Link
-              href="/gallery"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive("/gallery") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={closeMobileMenu}
-            >
-              Gallery
-            </Link>
-            <Link
-              href="/certificate-verification"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive("/certificate-verification") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={closeMobileMenu}
-            >
-              Verify Certificate
-            </Link>
-            <Link
-              href="/contact-us"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive("/contact-us") ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={closeMobileMenu}
-            >
-              Contact
-            </Link>
-
-            {session ? (
-              <>
-                <Link
-                  href={`/${session.user.role}/dashboard`}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
-                  onClick={closeMobileMenu}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={() => {
-                    closeMobileMenu()
-                    handleSignOut()
-                  }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
-                >
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700"
-                onClick={closeMobileMenu}
-              >
-                Login
-              </Link>
-            )}
-          </nav>
-        )}
+        <div className="flex items-center gap-4">
+          <Link href="#" aria-label="Facebook">
+            <Facebook className="h-4 w-4" />
+          </Link>
+          <Link href="#" aria-label="Twitter">
+            <Twitter className="h-4 w-4" />
+          </Link>
+          <Link href="#" aria-label="Instagram">
+            <Instagram className="h-4 w-4" />
+          </Link>
+          <Link href="#" aria-label="Information">
+            <Info className="h-4 w-4" />
+          </Link>
+          <div className="border-l border-gray-500 h-4 mx-2"></div>
+          <Link href="/login" className="text-sm hover:underline">
+            Login
+          </Link>
+          <div className="border-l border-gray-500 h-4 mx-2"></div>
+          <Link href="/franchise-registration" className="text-sm hover:underline">
+            Franchise Registration
+          </Link>
+          <div className="border-l border-gray-500 h-4 mx-2"></div>
+          <Link href="/download" className="text-sm hover:underline">
+            Download
+          </Link>
+          <div className="border-l border-gray-500 h-4 mx-2"></div>
+          <Link href="/atc-verification" className="text-sm hover:underline">
+            ATC Verification
+          </Link>
+        </div>
       </div>
-    </header>
+    </div>
   )
 }

@@ -3,72 +3,76 @@ import mongoose from "mongoose"
 const StudentSchema = new mongoose.Schema({
   studentId: {
     type: String,
-    required: true,
+    required: [true, "Please provide a student ID"],
     unique: true,
   },
-  password: {
+  name: {
     type: String,
-    required: true,
-  },
-  fullName: {
-    type: String,
-    required: true,
+    required: [true, "Please provide a name"],
   },
   fatherName: {
     type: String,
-    required: true,
+    required: [true, "Please provide father's name"],
   },
   motherName: {
     type: String,
-    required: true,
+    required: [true, "Please provide mother's name"],
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
+    required: [true, "Please provide an email"],
   },
   phone: {
     type: String,
-    required: true,
+    required: [true, "Please provide a phone number"],
   },
   address: {
     type: String,
-    required: true,
+    required: [true, "Please provide an address"],
   },
   dateOfBirth: {
     type: Date,
-    required: true,
+    required: [true, "Please provide a date of birth"],
   },
   gender: {
     type: String,
-    required: true,
-    enum: ["male", "female", "other"],
+    required: [true, "Please provide a gender"],
+    enum: ["Male", "Female", "Other"],
   },
-  courseId: {
+  course: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Course",
-    required: true,
+    required: [true, "Please provide a course"],
   },
-  photo: {
-    type: String,
-    default: "",
-  },
-  idCard: {
-    type: String,
-    default: "",
-  },
-  signature: {
-    type: String,
-    default: "",
-  },
-  registrationDate: {
+  enrollmentDate: {
     type: Date,
     default: Date.now,
   },
+  password: {
+    type: String,
+    required: [true, "Please provide a password"],
+  },
+  photoUrl: {
+    type: String,
+  },
+  idCardUrl: {
+    type: String,
+  },
+  signatureUrl: {
+    type: String,
+  },
   status: {
     type: String,
-    default: "active",
-    enum: ["active", "inactive", "completed", "dropped"],
+    enum: ["Active", "Inactive", "Completed", "Dropped"],
+    default: "Active",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
   },
 })
 

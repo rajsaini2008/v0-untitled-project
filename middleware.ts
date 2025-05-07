@@ -1,55 +1,16 @@
-import { NextResponse } from "next/server"
-import { getToken } from "next-auth/jwt"
-import type { NextRequest } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+export function middleware(request: NextRequest) {
+  // Get the path of the request
+  const path = request.nextUrl.pathname
 
-  // Get the token
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  })
+  // Check if the path is for the admin panel
+  if (path.startsWith("/admin")) {
+    // Get the auth token from cookies
+    const authToken = request.cookies.get("admin_token")?.value
 
-  // Check if user is authenticated
-  const isAuthenticated = !!token
-
-  // Define protected routes
-  const adminRoutes = pathname.startsWith("/admin")
-  const atcRoutes = pathname.startsWith("/atc")
-  const studentRoutes = pathname.startsWith("/student")
-  const authRoutes = pathname.startsWith("/login")
-
-  // Redirect logic
-  if (!isAuthenticated && (adminRoutes || atcRoutes || studentRoutes)) {
-    return NextResponse.redirect(new URL("/login", request.url))
-  }
-
-  // Check user role for specific routes
-  if (isAuthenticated) {
-    const userRole = token.role as string
-
-    // Redirect from login page if already authenticated
-    if (authRoutes) {
-      if (userRole === "admin") {
-        return NextResponse.redirect(new URL("/admin/dashboard", request.url))
-      } else if (userRole === "atc") {
-        return NextResponse.redirect(new URL("/atc/dashboard", request.url))
-      } else if (userRole === "student") {
-        return NextResponse.redirect(new URL("/student/dashboard", request.url))
-      }
-    }
-
-    // Check if user has access to specific routes
-    if (adminRoutes && userRole !== "admin") {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-
-    if (atcRoutes && userRole !== "atc") {
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-
-    if (studentRoutes && userRole !== "student") {
+    // If there's no token and the path is not the login page, redirect to login
+    if (!authToken && path !== "/login") {
       return NextResponse.redirect(new URL("/login", request.url))
     }
   }
@@ -58,5 +19,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/atc/:path*", "/student/:path*", "/login"],
+  matcher: ["/admin/:path*"],
 }

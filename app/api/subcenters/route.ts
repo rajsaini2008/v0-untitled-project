@@ -1,37 +1,57 @@
 import { NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongodb"
+import connectToDatabase from "@/lib/mongodb"
 import SubCenter from "@/models/SubCenter"
-
-export async function GET() {
-  try {
-    await connectToDatabase()
-    const subcenters = await SubCenter.find().sort({ registrationDate: -1 })
-
-    return NextResponse.json({ subcenters })
-  } catch (error) {
-    console.error("Error fetching subcenters:", error)
-    return NextResponse.json({ error: "Failed to fetch subcenters" }, { status: 500 })
-  }
-}
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json()
+    // Connect to the database
     await connectToDatabase()
 
-    // Create new subcenter
-    const subcenter = await SubCenter.create(data)
+    // Parse the request body
+    const body = await request.json()
 
-    return NextResponse.json({ subcenter }, { status: 201 })
+    // Create a new subcenter
+    const subcenter = await SubCenter.create(body)
+
+    return NextResponse.json({ success: true, data: subcenter }, { status: 201 })
   } catch (error) {
     console.error("Error creating subcenter:", error)
+    return NextResponse.json(
+      { success: false, message: "An error occurred while creating the subcenter" },
+      { status: 500 },
+    )
+  }
+}
 
-    // Handle duplicate key errors
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0]
-      return NextResponse.json({ error: `A subcenter with this ${field} already exists` }, { status: 400 })
+export async function GET(request: Request) {
+  try {
+    // Connect to the database
+    await connectToDatabase()
+
+    // Get the URL parameters
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get("id")
+
+    if (id) {
+      // Get a specific subcenter
+      const subcenter = await SubCenter.findById(id)
+
+      if (!subcenter) {
+        return NextResponse.json({ success: false, message: "SubCenter not found" }, { status: 404 })
+      }
+
+      return NextResponse.json({ success: true, data: subcenter })
     }
 
-    return NextResponse.json({ error: "Failed to create subcenter" }, { status: 500 })
+    // Get all subcenters
+    const subcenters = await SubCenter.find({}).sort({ createdAt: -1 })
+
+    return NextResponse.json({ success: true, data: subcenters })
+  } catch (error) {
+    console.error("Error fetching subcenters:", error)
+    return NextResponse.json(
+      { success: false, message: "An error occurred while fetching subcenters" },
+      { status: 500 },
+    )
   }
 }

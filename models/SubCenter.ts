@@ -1,56 +1,43 @@
 import mongoose from "mongoose"
 
 const SubCenterSchema = new mongoose.Schema({
-  subcenterId: {
+  centerId: {
     type: String,
-    required: true,
+    required: [true, "Please provide a center ID"],
     unique: true,
   },
-  password: {
+  name: {
     type: String,
-    required: true,
-  },
-  centerName: {
-    type: String,
-    required: true,
-  },
-  ownerName: {
-    type: String,
-    required: true,
+    required: [true, "Please provide a name"],
   },
   email: {
     type: String,
-    required: true,
+    required: [true, "Please provide an email"],
     unique: true,
   },
   phone: {
     type: String,
-    required: true,
+    required: [true, "Please provide a phone number"],
   },
   address: {
     type: String,
-    required: true,
+    required: [true, "Please provide an address"],
   },
-  city: {
+  password: {
     type: String,
-    required: true,
+    required: [true, "Please provide a password"],
   },
-  state: {
-    type: String,
-    required: true,
+  isActive: {
+    type: Boolean,
+    default: true,
   },
-  pincode: {
-    type: String,
-    required: true,
-  },
-  registrationDate: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
-  status: {
-    type: String,
-    default: "active",
-    enum: ["active", "inactive", "suspended"],
+  updatedAt: {
+    type: Date,
+    default: Date.now,
   },
 })
 
