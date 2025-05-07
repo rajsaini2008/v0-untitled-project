@@ -61,8 +61,7 @@
     "@auth/core": "latest",
     "nodemailer": "latest",
     "next-auth": "latest",
-    "mongoose": "latest",
-    "@vercel/blob": "latest"
+    "mongoose": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
