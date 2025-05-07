@@ -1,54 +1,37 @@
 import { NextResponse } from "next/server"
-import connectToDatabase from "@/lib/mongodb"
+import { connectToDatabase } from "@/lib/mongodb"
 import Student from "@/models/Student"
 
-export async function POST(request: Request) {
+export async function GET() {
   try {
-    // Connect to the database
     await connectToDatabase()
+    const students = await Student.find().populate("courseId").sort({ registrationDate: -1 })
 
-    // Parse the request body
-    const body = await request.json()
-
-    // Create a new student
-    const student = await Student.create(body)
-
-    return NextResponse.json({ success: true, data: student }, { status: 201 })
+    return NextResponse.json({ students })
   } catch (error) {
-    console.error("Error creating student:", error)
-    return NextResponse.json(
-      { success: false, message: "An error occurred while creating the student" },
-      { status: 500 },
-    )
+    console.error("Error fetching students:", error)
+    return NextResponse.json({ error: "Failed to fetch students" }, { status: 500 })
   }
 }
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   try {
-    // Connect to the database
+    const data = await request.json()
     await connectToDatabase()
 
-    // Get the URL parameters
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get("id")
+    // Create new student
+    const student = await Student.create(data)
 
-    if (id) {
-      // Get a specific student
-      const student = await Student.findById(id).populate("course")
+    return NextResponse.json({ student }, { status: 201 })
+  } catch (error) {
+    console.error("Error creating student:", error)
 
-      if (!student) {
-        return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 })
-      }
-
-      return NextResponse.json({ success: true, data: student })
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0]
+      return NextResponse.json({ error: `A student with this ${field} already exists` }, { status: 400 })
     }
 
-    // Get all students
-    const students = await Student.find({}).populate("course").sort({ createdAt: -1 })
-
-    return NextResponse.json({ success: true, data: students })
-  } catch (error) {
-    console.error("Error fetching students:", error)
-    return NextResponse.json({ success: false, message: "An error occurred while fetching students" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to create student" }, { status: 500 })
   }
 }

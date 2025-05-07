@@ -1,216 +1,134 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/components/ui/use-toast"
 
-export default function NewSubCenter() {
+export default function NewSubCenterPage() {
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    centerName: "",
-    ownerName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
-  })
+  const { toast } = useToast()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const generateRandomId = () => {
-    const randomNumbers = Math.floor(Math.random() * 10000000)
-      .toString()
-      .padStart(7, "0")
-    return `KR${randomNumbers}`
-  }
-
-  const generateRandomPassword = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    let password = ""
-    for (let i = 0; i < 8; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return password
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
+    setLoading(true)
 
-    // Generate ID and password
-    const atcId = generateRandomId()
-    const password = generateRandomPassword()
+    try {
+      const formData = new FormData(e.target)
 
-    // In a real application, this would be an API call to save the sub center
-    // For now, we'll just simulate a delay and show a success message
-    setTimeout(() => {
-      // Save to localStorage for demo purposes
-      const subCenters = JSON.parse(localStorage.getItem("subCenters") || "[]")
-      const newSubCenter = {
-        id: Date.now().toString(),
-        atcId,
+      // Generate subcenter ID and password
+      const subcenterId = "KR" + Math.floor(10000 + Math.random() * 90000)
+      const password = Math.random().toString(36).slice(-8)
+
+      // Create subcenter object
+      const subcenterData = {
+        subcenterId,
         password,
-        ...formData,
-        createdAt: new Date().toISOString(),
+        centerName: formData.get("centerName"),
+        ownerName: formData.get("ownerName"),
+        email: formData.get("email"),
+        phone: formData.get("phone"),
+        address: formData.get("address"),
+        city: formData.get("city"),
+        state: formData.get("state"),
+        pincode: formData.get("pincode"),
+        registrationDate: new Date().toISOString(),
       }
-      subCenters.push(newSubCenter)
-      localStorage.setItem("subCenters", JSON.stringify(subCenters))
 
-      // Also save to passwords collection
-      const passwords = JSON.parse(localStorage.getItem("passwords") || "[]")
-      passwords.push({
-        id: Date.now().toString(),
-        type: "subcenter",
-        userId: atcId,
-        password,
-        name: formData.centerName,
-        email: formData.email,
+      // Send data to API
+      const response = await fetch("/api/subcenters", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(subcenterData),
       })
-      localStorage.setItem("passwords", JSON.stringify(passwords))
 
+      const result = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Sub Center Added",
+          description: `Sub Center added successfully. ID: ${subcenterId}, Password: ${password}`,
+        })
+        router.push("/admin/subcenters")
+      } else {
+        throw new Error(result.error || "Failed to add sub center")
+      }
+    } catch (error) {
+      console.error("Error adding sub center:", error)
       toast({
-        title: "Sub Center added successfully",
-        description: `${formData.centerName} has been added with ID: ${atcId}`,
+        title: "Error",
+        description: error.message || "Failed to add sub center. Please try again.",
+        variant: "destructive",
       })
-      setIsSubmitting(false)
-      router.push("/admin/subcenters")
-    }, 1000)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Add New Sub Center</h1>
-      </div>
-
+    <div className="container mx-auto py-6">
       <Card>
         <CardHeader>
-          <CardTitle>Sub Center Information</CardTitle>
+          <CardTitle>Add New Sub Center</CardTitle>
+          <CardDescription>Enter sub center details to register them in the system</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="centerName">Center Name</Label>
-                <Input
-                  id="centerName"
-                  name="centerName"
-                  placeholder="Enter center name"
-                  value={formData.centerName}
-                  onChange={handleChange}
-                  required
-                />
+                <Input id="centerName" name="centerName" required />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="ownerName">Owner Name</Label>
-                <Input
-                  id="ownerName"
-                  name="ownerName"
-                  placeholder="Enter owner name"
-                  value={formData.ownerName}
-                  onChange={handleChange}
-                  required
-                />
+                <Input id="ownerName" name="ownerName" required />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
+                <Input id="email" name="email" type="email" required />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  placeholder="Enter phone number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
+                <Input id="phone" name="phone" required />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input id="city" name="city" required />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="state">State</Label>
+                <Input id="state" name="state" required />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pincode">Pincode</Label>
+                <Input id="pincode" name="pincode" required />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                name="address"
-                placeholder="Enter address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
+              <Textarea id="address" name="address" required />
             </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  placeholder="Enter city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
-                <Input
-                  id="state"
-                  name="state"
-                  placeholder="Enter state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pincode">Pincode</Label>
-                <Input
-                  id="pincode"
-                  name="pincode"
-                  placeholder="Enter pincode"
-                  value={formData.pincode}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <Button variant="outline" type="button" onClick={() => router.back()}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Sub Center"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Adding..." : "Add Sub Center"}
+            </Button>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   )

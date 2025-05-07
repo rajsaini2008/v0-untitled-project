@@ -1,79 +1,86 @@
-"use client"
+import type { NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { connectToDatabase } from "./mongodb"
+import User from "@/models/User"
+import Student from "@/models/Student"
+import SubCenter from "@/models/SubCenter"
 
-import { useState, useEffect } from "react"
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+        userType: { label: "User Type", type: "text" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password || !credentials?.userType) {
+          return null
+        }
 
-// Default admin credentials
-const DEFAULT_ADMIN = {
-  email: "admin@krishnacomputers.com",
-  password: "admin123",
-}
+        try {
+          await connectToDatabase()
 
-export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userType, setUserType] = useState<"admin" | "student" | "atc" | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+          let user = null
 
-  useEffect(() => {
-    // Check if user is authenticated on component mount
-    const token = localStorage.getItem("auth_token")
-    const type = localStorage.getItem("user_type")
+          // Check based on user type
+          if (credentials.userType === "admin") {
+            user = await User.findOne({
+              email: credentials.email,
+              password: credentials.password,
+              role: "admin",
+            })
+          } else if (credentials.userType === "atc") {
+            user = await SubCenter.findOne({
+              email: credentials.email,
+              password: credentials.password,
+            })
+          } else if (credentials.userType === "student") {
+            user = await Student.findOne({
+              email: credentials.email,
+              password: credentials.password,
+            })
+          }
 
-    if (token && type) {
-      setIsAuthenticated(true)
-      setUserType(type as "admin" | "student" | "atc")
-    }
+          if (!user) {
+            return null
+          }
 
-    setIsLoading(false)
-  }, [])
-
-  const login = (type: "admin" | "student" | "atc", identifier: string, password: string) => {
-    // Check if credentials match
-    if (type === "admin" && identifier === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
-      // Set token in localStorage
-      localStorage.setItem("auth_token", "admin-jwt-token")
-      localStorage.setItem("user_type", "admin")
-      setIsAuthenticated(true)
-      setUserType("admin")
-      return true
-    } else if (type === "student") {
-      // Check student credentials from localStorage
-      const students = JSON.parse(localStorage.getItem("students") || "[]")
-      const student = students.find((s: any) => s.studentId === identifier && s.password === password)
-
-      if (student) {
-        localStorage.setItem("auth_token", `student-${student.id}`)
-        localStorage.setItem("user_type", "student")
-        localStorage.setItem("current_user_id", student.id)
-        setIsAuthenticated(true)
-        setUserType("student")
-        return true
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            name: user.name || user.centerName || user.fullName,
+            role: credentials.userType,
+          }
+        } catch (error) {
+          console.error("Auth error:", error)
+          return null
+        }
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.role = user.role
       }
-    } else if (type === "atc") {
-      // Check ATC credentials from localStorage
-      const subCenters = JSON.parse(localStorage.getItem("subCenters") || "[]")
-      const center = subCenters.find((c: any) => c.atcId === identifier && c.password === password)
-
-      if (center) {
-        localStorage.setItem("auth_token", `atc-${center.id}`)
-        localStorage.setItem("user_type", "atc")
-        localStorage.setItem("current_user_id", center.id)
-        setIsAuthenticated(true)
-        setUserType("atc")
-        return true
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
       }
-    }
-
-    return false
-  }
-
-  const logout = () => {
-    // Remove token from localStorage
-    localStorage.removeItem("auth_token")
-    localStorage.removeItem("user_type")
-    localStorage.removeItem("current_user_id")
-    setIsAuthenticated(false)
-    setUserType(null)
-  }
-
-  return { isAuthenticated, isLoading, userType, login, logout }
+      return session
+    },
+  },
+  pages: {
+    signIn: "/login",
+  },
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }
